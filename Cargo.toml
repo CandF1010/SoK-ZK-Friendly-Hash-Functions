@@ -1,0 +1,13 @@
+[package]
+name = "sok-zk-friendly-hash-functions"
+version = "0.1.0"
+edition = "2021"
+
+[lib]
+path = "Plain_implementations/lib.rs"
+
+[dependencies]
+lazy_static = "1.4"
+num-bigint = "0.4"
+num-traits = "0.2"
+sha3 = "0.10"

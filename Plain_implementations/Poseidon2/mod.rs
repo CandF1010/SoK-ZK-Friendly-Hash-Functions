@@ -1,0 +1,8 @@
+pub mod poseidon2;
+pub mod poseidon2_params;
+pub mod poseidon2_goldilocks;
+pub mod poseidon2_babybear;
+pub mod poseidon2_koalabear;
+pub mod poseidon2_bn254;
+pub mod poseidon2_felt252;
+pub mod poseidon2_bls12_381;
