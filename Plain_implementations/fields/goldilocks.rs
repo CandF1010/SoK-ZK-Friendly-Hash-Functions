@@ -1,4 +1,4 @@
-use super::{FieldElement, PrimeField};
+use super::{FieldElement, PrimeField, PrimeFieldExt, PrimeFieldWords};
 use core::fmt;
 use num_bigint::BigUint;
 use num_traits::ToPrimitive;
@@ -23,6 +23,10 @@ impl Goldilocks {
             c -= Self::MODULUS;
         }
         c
+    }
+
+    pub fn to_u64(&self) -> u64 {
+        self.to_canonical_u64()
     }
 }
 
@@ -95,6 +99,18 @@ impl PrimeField for Goldilocks {
 
     fn generator() -> BigUint {
         BigUint::from(7u32)
+    }
+}
+
+impl PrimeFieldExt for Goldilocks {
+    fn to_biguint(&self) -> BigUint {
+        BigUint::from(self.to_u64())
+    }
+}
+
+impl PrimeFieldWords for Goldilocks {
+    fn to_words_le(&self) -> [u64; 4] {
+        [self.to_u64(), 0, 0, 0]
     }
 }
 

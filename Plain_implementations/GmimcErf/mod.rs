@@ -2,6 +2,7 @@ pub mod gmimc_erf;
 pub mod gmimc_erf_params;
 pub mod gmimc_erf_babybear;
 pub mod gmimc_erf_koalabear;
+pub mod gmimc_erf_mersenne31;
 pub mod gmimc_erf_goldilocks;
 pub mod gmimc_erf_bn254;
 pub mod gmimc_erf_bls12_381;

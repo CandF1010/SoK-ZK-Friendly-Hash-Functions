@@ -2,6 +2,7 @@ pub mod poseidon;
 pub mod poseidon_params;
 pub mod poseidon_babybear;
 pub mod poseidon_koalabear;
+pub mod poseidon_mersenne31;
 pub mod poseidon_goldilocks;
 pub mod poseidon_bn254;
 pub mod poseidon_bls12_381;

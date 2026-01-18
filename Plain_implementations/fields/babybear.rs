@@ -1,5 +1,5 @@
 use super::montgomery_31::{Monty31Params, MontyField31};
-use super::{FieldElement, PrimeField};
+use super::{FieldElement, PrimeField, PrimeFieldExt, PrimeFieldWords};
 use core::fmt;
 use num_bigint::BigUint;
 use num_traits::ToPrimitive;
@@ -73,5 +73,17 @@ impl PrimeField for BabyBear {
 
     fn generator() -> BigUint {
         BigUint::from(31u32)
+    }
+}
+
+impl PrimeFieldExt for BabyBear {
+    fn to_biguint(&self) -> BigUint {
+        BigUint::from(self.to_u32() as u64)
+    }
+}
+
+impl PrimeFieldWords for BabyBear {
+    fn to_words_le(&self) -> [u64; 4] {
+        [self.to_u32() as u64, 0, 0, 0]
     }
 }

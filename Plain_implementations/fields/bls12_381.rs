@@ -1,4 +1,4 @@
-use super::{FieldElement, PrimeField};
+use super::{biguint_from_limbs_le, FieldElement, PrimeField, PrimeFieldExt, PrimeFieldWords};
 use super::montgomery_4::{
     add_mod, from_hex_to_limbs, monty_mul, reduce_raw, sub_mod, to_monty, MontyParams,
 };
@@ -87,5 +87,18 @@ impl PrimeField for Bls12_381 {
 
     fn generator() -> BigUint {
         BigUint::from(7u32)
+    }
+}
+
+impl PrimeFieldExt for Bls12_381 {
+    fn to_biguint(&self) -> BigUint {
+        let normal = monty_mul::<Bls12_381Params>(self.value, [1, 0, 0, 0]);
+        biguint_from_limbs_le(&normal)
+    }
+}
+
+impl PrimeFieldWords for Bls12_381 {
+    fn to_words_le(&self) -> [u64; 4] {
+        monty_mul::<Bls12_381Params>(self.value, [1, 0, 0, 0])
     }
 }

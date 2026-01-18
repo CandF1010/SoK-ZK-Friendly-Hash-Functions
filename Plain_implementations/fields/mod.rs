@@ -4,10 +4,12 @@ pub mod bn254;
 pub mod felt252;
 pub mod goldilocks;
 pub mod koalabear;
+pub mod mersenne31;
 mod montgomery_4;
 mod montgomery_31;
 
 use num_bigint::BigUint;
+use num_traits::Zero;
 
 pub trait FieldElement: Clone + Default + PartialEq + Eq + std::fmt::Debug {
     fn zero() -> Self;
@@ -54,4 +56,21 @@ pub trait PrimeField: FieldElement {
     fn modulus() -> BigUint;
     fn from_biguint(value: &BigUint) -> Self;
     fn generator() -> BigUint;
+}
+
+pub trait PrimeFieldExt: PrimeField {
+    fn to_biguint(&self) -> BigUint;
+}
+
+pub trait PrimeFieldWords: PrimeFieldExt {
+    fn to_words_le(&self) -> [u64; 4];
+}
+
+pub(crate) fn biguint_from_limbs_le(limbs: &[u64]) -> BigUint {
+    let mut value = BigUint::zero();
+    for limb in limbs.iter().rev() {
+        value <<= 64;
+        value += BigUint::from(*limb);
+    }
+    value
 }
