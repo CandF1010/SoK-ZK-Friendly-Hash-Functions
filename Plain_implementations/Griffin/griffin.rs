@@ -1,7 +1,43 @@
-use super::griffin_params::GriffinParams;
 use crate::fields::FieldElement;
-use crate::utils::pow_biguint;
 use std::sync::Arc;
+
+#[derive(Clone, Debug)]
+pub struct GriffinParams<F: FieldElement> {
+    pub(crate) t: usize,
+    pub(crate) d: u64,
+    pub(crate) d_inv: [u64; 4],
+    pub(crate) rounds: usize,
+    pub(crate) alpha_beta: Vec<[F; 2]>,
+    pub(crate) round_constants: Vec<Vec<F>>, // [round_idx][state_idx], only for first rounds-1 rounds
+}
+
+impl<F: FieldElement> GriffinParams<F> {
+    pub fn new(
+        t: usize,
+        d: u64,
+        d_inv: [u64; 4],
+        rounds: usize,
+        alpha_beta: &[[F; 2]],
+        round_constants: &[Vec<F>],
+    ) -> Self {
+        assert!(t == 3 || (t >= 8 && t % 4 == 0));
+        assert!(rounds >= 1);
+        assert_eq!(alpha_beta.len(), t.saturating_sub(2));
+        assert_eq!(round_constants.len(), rounds.saturating_sub(1));
+        for rc in round_constants {
+            assert_eq!(rc.len(), t);
+        }
+
+        GriffinParams {
+            t,
+            d,
+            d_inv,
+            rounds,
+            alpha_beta: alpha_beta.to_vec(),
+            round_constants: round_constants.to_owned(),
+        }
+    }
+}
 
 #[derive(Clone, Debug)]
 pub struct Griffin<F: FieldElement> {
@@ -24,166 +60,166 @@ impl<F: FieldElement> Griffin<F> {
         assert_eq!(input.len(), t);
 
         let mut state = input.to_vec();
+        // Griffin-π: Gπ(x) = F_{R-1} ∘ ... ∘ F0(M * x)
+        self.linear_layer(&mut state);
 
-        for r in 0..self.params.rounds {
+        for round in 0..self.params.rounds {
             state = self.non_linear(&state);
-            self.affine(&mut state, r);
+            self.linear_layer(&mut state);
+            if round + 1 < self.params.rounds {
+                self.add_rc_in_place(&mut state, round);
+            }
         }
 
         state
     }
 
-    fn affine_3(&self, input: &mut [F], round: usize) {
-        let mut sum = input[0].clone();
-        for el in input.iter().skip(1) {
-            sum.add_assign(el);
-        }
-
-        if round < self.params.rounds - 1 {
-            for (el, rc) in input
-                .iter_mut()
-                .zip(self.params.round_constants[round].iter())
-            {
-                el.add_assign(&sum);
-                el.add_assign(rc);
-            }
-        } else {
-            for el in input.iter_mut() {
-                el.add_assign(&sum);
-            }
-        }
-    }
-
-    fn affine_4(&self, input: &mut [F], round: usize) {
-        let mut t_0 = input[0].clone();
-        t_0.add_assign(&input[1]);
-        let mut t_1 = input[2].clone();
-        t_1.add_assign(&input[3]);
-        let mut t_2 = input[1].clone();
-        t_2.double();
-        t_2.add_assign(&t_1);
-        let mut t_3 = input[3].clone();
-        t_3.double();
-        t_3.add_assign(&t_0);
-        let mut t_4 = t_1.clone();
-        t_4.double();
-        t_4.double();
-        t_4.add_assign(&t_3);
-        let mut t_5 = t_0.clone();
-        t_5.double();
-        t_5.double();
-        t_5.add_assign(&t_2);
-        let mut t_6 = t_3;
-        t_6.add_assign(&t_5);
-        let mut t_7 = t_2;
-        t_7.add_assign(&t_4);
-        input[0] = t_6;
-        input[1] = t_5;
-        input[2] = t_7;
-        input[3] = t_4;
-
-        if round < self.params.rounds - 1 {
-            for (el, rc) in input
-                .iter_mut()
-                .zip(self.params.round_constants[round].iter())
-            {
-                el.add_assign(rc);
-            }
-        }
-    }
-
-    fn affine(&self, input: &mut [F], round: usize) {
-        if self.params.t == 3 {
-            self.affine_3(input, round);
-            return;
-        }
-        if self.params.t == 4 {
-            self.affine_4(input, round);
-            return;
-        }
-
-        let t4 = self.params.t / 4;
-        for chunk in input.chunks_exact_mut(4) {
-            let mut t_0 = chunk[0].clone();
-            t_0.add_assign(&chunk[1]);
-            let mut t_1 = chunk[2].clone();
-            t_1.add_assign(&chunk[3]);
-            let mut t_2 = chunk[1].clone();
-            t_2.double();
-            t_2.add_assign(&t_1);
-            let mut t_3 = chunk[3].clone();
-            t_3.double();
-            t_3.add_assign(&t_0);
-            let mut t_4 = t_1.clone();
-            t_4.double();
-            t_4.double();
-            t_4.add_assign(&t_3);
-            let mut t_5 = t_0.clone();
-            t_5.double();
-            t_5.double();
-            t_5.add_assign(&t_2);
-            let mut t_6 = t_3;
-            t_6.add_assign(&t_5);
-            let mut t_7 = t_2;
-            t_7.add_assign(&t_4);
-            chunk[0] = t_6;
-            chunk[1] = t_5;
-            chunk[2] = t_7;
-            chunk[3] = t_4;
-        }
-
-        let mut stored = vec![F::zero(); 4];
-        for l in 0..4 {
-            stored[l] = input[l].clone();
-            for j in 1..t4 {
-                stored[l].add_assign(&input[4 * j + l]);
-            }
-        }
-
-        for i in 0..input.len() {
-            input[i].add_assign(&stored[i % 4]);
-            if round < self.params.rounds - 1 {
-                input[i].add_assign(&self.params.round_constants[round][i]);
-            }
-        }
-    }
-
-    fn l(y01_i: &mut F, y0: &F, x: &F, i: usize) -> F {
-        if i == 0 {
-            y01_i.to_owned()
-        } else {
-            y01_i.add_assign(y0);
-            let mut out = y01_i.to_owned();
-            out.add_assign(x);
-            out
-        }
-    }
-
     fn non_linear(&self, input: &[F]) -> Vec<F> {
-        let mut output = input.to_owned();
-        output[0] = pow_biguint(&output[0], &self.params.d_inv);
-        output[1] = output[1].pow_u64(self.params.d);
+        let mut output = input.to_vec();
 
-        let mut y01_i = output[0].to_owned();
-        let y0 = y01_i.to_owned();
-        y01_i.add_assign(&output[1]);
+        output[0] = output[0].pow_words_le(&self.params.d_inv);
+        output[1] = self.sbox_d(&input[1]);
 
-        for (i, ((out, inp), con)) in output
+        let y0 = output[0].clone();
+        let mut y01 = y0.clone();
+        y01.add_assign(&output[1]);
+
+        for (i, ((out, prev), ab)) in output
             .iter_mut()
             .skip(2)
             .zip(input.iter().skip(1))
             .zip(self.params.alpha_beta.iter())
             .enumerate()
         {
-            let mut l = Self::l(&mut y01_i, &y0, inp, i);
-            let mut l_squ = l.to_owned();
-            l_squ.square();
-            l.mul_assign(&con[0]);
-            l.add_assign(&l_squ);
-            l.add_assign(&con[1]);
-            out.mul_assign(&l);
+            let l = if i == 0 {
+                y01.clone()
+            } else {
+                y01.add_assign(&y0);
+                let mut tmp = y01.clone();
+                tmp.add_assign(prev);
+                tmp
+            };
+
+            let mut poly = l.clone();
+            poly.square();
+
+            let mut alpha_l = l;
+            alpha_l.mul_assign(&ab[0]);
+            poly.add_assign(&alpha_l);
+            poly.add_assign(&ab[1]);
+
+            out.mul_assign(&poly);
         }
 
         output
+    }
+
+    fn sbox_d(&self, input: &F) -> F {
+        let mut input2 = input.clone();
+        input2.square();
+
+        match self.params.d {
+            3 => {
+                let mut out = input2;
+                out.mul_assign(input);
+                out
+            }
+            5 => {
+                let mut out = input2;
+                out.square();
+                out.mul_assign(input);
+                out
+            }
+            7 => {
+                let mut out = input2.clone();
+                out.square();
+                out.mul_assign(&input2);
+                out.mul_assign(input);
+                out
+            }
+            _ => input.pow_u64(self.params.d),
+        }
+    }
+
+    fn linear_layer(&self, state: &mut [F]) {
+        match state.len() {
+            3 => {
+                // circulant(2,1,1): add global sum to each coordinate.
+                let mut sum = state[0].clone();
+                for x in state.iter().skip(1) {
+                    sum.add_assign(x);
+                }
+                for x in state.iter_mut() {
+                    x.add_assign(&sum);
+                }
+            }
+            t if t >= 8 && t % 4 == 0 => {
+                // Structured multiplication by M = M' * M'' for t = 4t' >= 8.
+                let t4 = t / 4;
+
+                for chunk in state.chunks_exact_mut(4) {
+                    Self::apply_m4(chunk);
+                }
+
+                let mut lanes = [F::zero(), F::zero(), F::zero(), F::zero()];
+                for lane in 0..4 {
+                    lanes[lane] = state[lane].clone();
+                    for block in 1..t4 {
+                        lanes[lane].add_assign(&state[4 * block + lane]);
+                    }
+                }
+
+                for i in 0..state.len() {
+                    state[i].add_assign(&lanes[i % 4]);
+                }
+            }
+            _ => panic!("unsupported width"),
+        }
+    }
+
+    #[inline(always)]
+    fn apply_m4(state: &mut [F]) {
+        debug_assert_eq!(state.len(), 4);
+
+        let mut t0 = state[0].clone();
+        t0.add_assign(&state[1]);
+        let mut t1 = state[2].clone();
+        t1.add_assign(&state[3]);
+
+        let mut t2 = state[1].clone();
+        t2.double();
+        t2.add_assign(&t1);
+
+        let mut t3 = state[3].clone();
+        t3.double();
+        t3.add_assign(&t0);
+
+        let mut t4 = t1;
+        t4.double();
+        t4.double();
+        t4.add_assign(&t3);
+
+        let mut t5 = t0;
+        t5.double();
+        t5.double();
+        t5.add_assign(&t2);
+
+        let mut t6 = t3;
+        t6.add_assign(&t5);
+
+        let mut t7 = t2;
+        t7.add_assign(&t4);
+
+        state[0] = t6;
+        state[1] = t5;
+        state[2] = t7;
+        state[3] = t4;
+    }
+
+    fn add_rc_in_place(&self, state: &mut [F], round: usize) {
+        let rc = &self.params.round_constants[round];
+        for (x, c) in state.iter_mut().zip(rc.iter()) {
+            x.add_assign(c);
+        }
     }
 }

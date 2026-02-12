@@ -1,6 +1,106 @@
-use super::reinforced_concrete_params::ReinforcedConcreteParams;
-use crate::fields::{FieldElement, PrimeFieldWords};
+use crate::fields::{biguint_to_limbs_le_4, PrimeFieldWords};
+use sha3::digest::{ExtendableOutput, Update, XofReader};
+use sha3::Shake128;
+use std::cmp::Ordering;
 use std::sync::Arc;
+
+#[derive(Clone, Debug)]
+pub struct ReinforcedConcreteParams<F: PrimeFieldWords> {
+    pub(crate) round_constants: Vec<Vec<F>>, // [round_idx][state_idx]
+    pub(crate) alphas: Vec<u16>,
+    pub(crate) betas: Vec<F>,
+    pub(crate) si: Vec<u16>,
+    pub(crate) sbox: Vec<u16>,
+}
+
+impl<F: PrimeFieldWords> ReinforcedConcreteParams<F> {
+    pub const T: usize = 3;
+    pub const PRE_ROUNDS: usize = 3;
+    pub const POST_ROUNDS: usize = 3;
+    pub const TOTAL_ROUNDS: usize = Self::PRE_ROUNDS + Self::POST_ROUNDS + 1;
+    pub const INIT_SHAKE: &'static str = "ReinforcedConcrete";
+
+    pub fn new(si: &[u16], sbox: &[u16], alphas: &[u16], betas: &[u16]) -> Self {
+        assert_eq!(alphas.len(), Self::T - 1);
+        assert_eq!(betas.len(), Self::T - 1);
+
+        let mut shake = Self::init_shake();
+        let round_constants = Self::instantiate_rc(&mut shake);
+
+        let betas_field = betas.iter().map(|b| F::from_u64(*b as u64)).collect();
+
+        ReinforcedConcreteParams {
+            round_constants,
+            alphas: alphas.to_owned(),
+            betas: betas_field,
+            si: si.to_owned(),
+            sbox: Self::pad_sbox(sbox, si),
+        }
+    }
+
+    // Domain-separate RC generation by algorithm tag and field modulus.
+    fn init_shake() -> impl XofReader {
+        let mut shake = Shake128::default();
+        shake.update(Self::INIT_SHAKE.as_bytes());
+
+        let limbs = biguint_to_limbs_le_4(&F::modulus());
+        for limb in limbs {
+            shake.update(&u64::to_le_bytes(limb));
+        }
+
+        shake.finalize_xof()
+    }
+
+    // Build the full round-constant matrix with shape [TOTAL_ROUNDS + 1][T].
+    fn instantiate_rc(shake: &mut dyn XofReader) -> Vec<Vec<F>> {
+        (0..=Self::TOTAL_ROUNDS)
+            .map(|_| {
+                (0..Self::T)
+                    .map(|_| Self::field_element_from_shake(shake))
+                    .collect()
+            })
+            .collect()
+    }
+
+    // Sample a field element from XOF output using masked bytes and rejection sampling.
+    fn field_element_from_shake(reader: &mut dyn XofReader) -> F {
+        let modulus = F::modulus();
+        let bits = modulus.bits() as usize;
+        let bytes = bits.div_ceil(8);
+        let modulus_words = biguint_to_limbs_le_4(&modulus);
+        let mod_bits = bits % 8;
+        let mask = if mod_bits == 0 {
+            0xFFu8
+        } else {
+            (1u8 << mod_bits) - 1
+        };
+
+        let mut buf = vec![0u8; bytes];
+        let last = bytes - 1;
+
+        loop {
+            reader.read(&mut buf);
+            buf[last] &= mask;
+            let candidate_words = bytes_to_words_le_4(&buf);
+            if cmp_words_4(candidate_words, modulus_words) == Ordering::Less {
+                return F::from_words_le(candidate_words);
+            }
+        }
+    }
+
+    // Pad the lookup table with identity values so Bars indexing is always defined.
+    fn pad_sbox(sbox: &[u16], si: &[u16]) -> Vec<u16> {
+        let max = *si.iter().max().expect("si must not be empty");
+        assert!(sbox.len() <= max as usize);
+
+        let mut out = sbox.to_owned();
+        out.reserve((max as usize) - sbox.len());
+        for i in (sbox.len() as u16)..max {
+            out.push(i);
+        }
+        out
+    }
+}
 
 #[derive(Clone, Debug)]
 pub struct ReinforcedConcrete<F: PrimeFieldWords> {
@@ -15,131 +115,168 @@ impl<F: PrimeFieldWords> ReinforcedConcrete<F> {
     }
 
     pub fn get_t(&self) -> usize {
-        self.params.get_t()
+        ReinforcedConcreteParams::<F>::T
     }
 
     pub fn permutation(&self, input: &[F]) -> Vec<F> {
         assert_eq!(input.len(), ReinforcedConcreteParams::<F>::T);
-        let mut state = [input[0].clone(), input[1].clone(), input[2].clone()];
 
-        self.concrete(&mut state, 0);
+        let mut state = input.to_vec();
+        self.concrete_in_place(&mut state, 0);
 
         for round in 1..=ReinforcedConcreteParams::<F>::PRE_ROUNDS {
             state = self.bricks(&state);
-            self.concrete(&mut state, round);
+            self.concrete_in_place(&mut state, round);
         }
 
         state = self.bars(&state);
-        self.concrete(
-            &mut state,
-            ReinforcedConcreteParams::<F>::PRE_ROUNDS + 1,
-        );
+        self.concrete_in_place(&mut state, ReinforcedConcreteParams::<F>::PRE_ROUNDS + 1);
 
-        for round in ReinforcedConcreteParams::<F>::PRE_ROUNDS + 2
+        for round in (ReinforcedConcreteParams::<F>::PRE_ROUNDS + 2)
             ..=ReinforcedConcreteParams::<F>::TOTAL_ROUNDS
         {
             state = self.bricks(&state);
-            self.concrete(&mut state, round);
+            self.concrete_in_place(&mut state, round);
         }
 
-        state.to_vec()
+        state
     }
 
-    fn concrete(&self, state: &mut [F; 3], round: usize) {
-        let mut sum = state[0].clone();
-        sum.add_assign(&state[1]);
-        sum.add_assign(&state[2]);
+    fn concrete_in_place(&self, state: &mut [F], round: usize) {
+        // Multiplication by circulant(2,1,1,...) is state + sum(state).
+        let mut sum = F::zero();
+        for x in state.iter() {
+            sum.add_assign(x);
+        }
 
-        for (el, rc) in state.iter_mut().zip(self.params.round_constants[round].iter()) {
-            el.add_assign(&sum);
-            el.add_assign(rc);
+        for (x, rc) in state
+            .iter_mut()
+            .zip(self.params.round_constants[round].iter())
+        {
+            x.add_assign(&sum);
+            x.add_assign(rc);
         }
     }
 
-    fn bricks(&self, state: &[F; 3]) -> [F; 3] {
-        let mut out = [F::zero(), F::zero(), F::zero()];
-        let d = self.params.d;
+    fn bricks(&self, state: &[F]) -> Vec<F> {
+        let mut out = state.to_vec();
 
-        let mut x0_sq = state[0].clone();
-        x0_sq.square();
-        let mut x1_sq = state[1].clone();
-        x1_sq.square();
+        let mut x0_2 = state[0].clone();
+        x0_2.square();
+        x0_2.square();
+        x0_2.mul_assign(&state[0]);
+        out[0] = x0_2;
 
-        let mut x0_pow = match d {
-            3 | 5 => x0_sq.clone(),
-            _ => state[0].pow_u64(d),
-        };
-        if d == 5 {
-            x0_pow.square();
+        for i in 1..state.len() {
+            let prev = &state[i - 1];
+            let mut prev_sq = prev.clone();
+            prev_sq.square();
+
+            for _ in 0..self.params.alphas[i - 1] {
+                prev_sq.add_assign(prev);
+            }
+            prev_sq.add_assign(&self.params.betas[i - 1]);
+            prev_sq.mul_assign(&state[i]);
+
+            out[i] = prev_sq;
         }
-        if d == 3 || d == 5 {
-            x0_pow.mul_assign(&state[0]);
-        }
-        out[0] = x0_pow;
-
-        let mut t1 = x0_sq;
-        let mut alpha0 = self.params.alpha[0].clone();
-        alpha0.mul_assign(&state[0]);
-        t1.add_assign(&alpha0);
-        t1.add_assign(&self.params.beta[0]);
-        t1.mul_assign(&state[1]);
-        out[1] = t1;
-
-        let mut t2 = x1_sq;
-        let mut alpha1 = self.params.alpha[1].clone();
-        alpha1.mul_assign(&state[1]);
-        t2.add_assign(&alpha1);
-        t2.add_assign(&self.params.beta[1]);
-        t2.mul_assign(&state[2]);
-        out[2] = t2;
 
         out
     }
 
-    fn bars(&self, state: &[F; 3]) -> [F; 3] {
-        let mut out = state.to_owned();
-        for el in out.iter_mut() {
-            let mut digits = self.decompose(el);
-            for digit in digits.iter_mut() {
-                if *digit < self.params.p_prime {
-                    *digit = self.params.sbox[*digit as usize];
-                }
+    fn bars(&self, state: &[F]) -> Vec<F> {
+        let mut out = state.to_vec();
+        for x in out.iter_mut() {
+            let mut digits = self.decompose(x);
+            for d in digits.iter_mut() {
+                *d = self.params.sbox[*d as usize];
             }
-            *el = self.compose(&digits);
+            *x = self.compose(&digits);
         }
         out
     }
 
     fn decompose(&self, val: &F) -> Vec<u16> {
-        let mut limbs = val.to_words_le();
-        let mut res = vec![0u16; self.params.si.len()];
-        for i in (1..self.params.si.len()).rev() {
-            let (quot, rem) = div_rem_small(&limbs, self.params.si[i] as u64);
-            res[i] = rem;
-            limbs = quot;
+        let len = self.params.si.len();
+        let mut out = vec![0u16; len];
+        let mut n = val.to_words_le();
+
+        for i in (1..len).rev() {
+            let (q, r) = div_rem_words_u16(n, self.params.si[i]);
+            out[i] = r;
+            n = q;
         }
-        res[0] = limbs[0] as u16;
-        res
+
+        out[0] = words_to_u16_strict(n);
+
+        out
     }
 
-    fn compose(&self, digits: &[u16]) -> F {
-        let mut acc = F::from_u64(digits[0] as u64);
-        for (digit, base) in digits.iter().zip(self.params.si.iter()).skip(1) {
-            let base_f = F::from_u64(*base as u64);
-            acc.mul_assign(&base_f);
-            acc.add_assign(&F::from_u64(*digit as u64));
+    fn compose(&self, vals: &[u16]) -> F {
+        assert_eq!(vals.len(), self.params.si.len());
+
+        let mut n = [0u64; 4];
+        n[0] = vals[0] as u64;
+        for (val, base) in vals.iter().zip(self.params.si.iter()).skip(1) {
+            n = mul_add_words_u16(n, *base, *val);
         }
-        acc
+
+        F::from_words_le(n)
     }
 }
 
-fn div_rem_small(limbs: &[u64; 4], base: u64) -> ([u64; 4], u16) {
+fn bytes_to_words_le_4(bytes: &[u8]) -> [u64; 4] {
     let mut out = [0u64; 4];
-    let mut rem: u128 = 0;
-    for i in (0..4).rev() {
-        let cur = (rem << 64) | limbs[i] as u128;
-        out[i] = (cur / base as u128) as u64;
-        rem = cur % base as u128;
+    for (i, b) in bytes.iter().enumerate().take(32) {
+        out[i / 8] |= (*b as u64) << ((i % 8) * 8);
     }
-    (out, rem as u16)
+    out
+}
+
+fn cmp_words_4(lhs: [u64; 4], rhs: [u64; 4]) -> Ordering {
+    for i in (0..4).rev() {
+        if lhs[i] < rhs[i] {
+            return Ordering::Less;
+        }
+        if lhs[i] > rhs[i] {
+            return Ordering::Greater;
+        }
+    }
+    Ordering::Equal
+}
+
+fn div_rem_words_u16(mut n: [u64; 4], base: u16) -> ([u64; 4], u16) {
+    assert!(base > 0, "division base must be non-zero");
+    let base_u128 = base as u128;
+    let mut rem = 0u128;
+
+    for i in (0..4).rev() {
+        let cur = (rem << 64) | n[i] as u128;
+        n[i] = (cur / base_u128) as u64;
+        rem = cur % base_u128;
+    }
+
+    (n, rem as u16)
+}
+
+fn mul_add_words_u16(n: [u64; 4], base: u16, add: u16) -> [u64; 4] {
+    let base_u128 = base as u128;
+    let mut out = [0u64; 4];
+    let mut carry = add as u128;
+
+    for i in 0..4 {
+        let acc = (n[i] as u128) * base_u128 + carry;
+        out[i] = acc as u64;
+        carry = acc >> 64;
+    }
+
+    assert_eq!(carry, 0, "overflow while composing RC digits");
+    out
+}
+
+fn words_to_u16_strict(n: [u64; 4]) -> u16 {
+    assert_eq!(n[1], 0, "high limb must be zero in RC decomposition");
+    assert_eq!(n[2], 0, "high limb must be zero in RC decomposition");
+    assert_eq!(n[3], 0, "high limb must be zero in RC decomposition");
+    u16::try_from(n[0]).expect("most significant RC digit must fit into u16")
 }

@@ -8,8 +8,8 @@ pub mod poseidon;
 pub mod anemoi;
 #[path = "GmimcErf/mod.rs"]
 pub mod gmimc_erf;
-#[path = "Rescue/mod.rs"]
-pub mod rescue;
+#[path = "Rescueprime/mod.rs"]
+pub mod rescueprime;
 #[path = "Griffin/mod.rs"]
 pub mod griffin;
 #[path = "Neptune/mod.rs"]
@@ -18,7 +18,7 @@ pub mod neptune;
 pub mod reinforced_concrete;
 #[path = "Tip5/mod.rs"]
 pub mod tip5;
-#[path = "Tip4/mod.rs"]
+#[path = "Tip4‘/mod.rs"]
 pub mod tip4;
 #[path = "Monolith/mod.rs"]
 pub mod monolith;

@@ -1,180 +1,89 @@
 use sok_zk_friendly_hash_functions::anemoi::anemoi::Anemoi;
-use sok_zk_friendly_hash_functions::anemoi::anemoi_babybear::{
-    ANEMOI_BABYBEAR_2_PARAMS, ANEMOI_BABYBEAR_4_PARAMS,
-};
-use sok_zk_friendly_hash_functions::anemoi::anemoi_bls12_381::{
-    ANEMOI_BLS12_381_2_PARAMS, ANEMOI_BLS12_381_4_PARAMS,
-};
-use sok_zk_friendly_hash_functions::anemoi::anemoi_bn254::{
-    ANEMOI_BN254_2_PARAMS, ANEMOI_BN254_4_PARAMS,
-};
-use sok_zk_friendly_hash_functions::anemoi::anemoi_goldilocks::{
-    ANEMOI_GOLDILOCKS_2_PARAMS, ANEMOI_GOLDILOCKS_4_PARAMS,
-};
-use sok_zk_friendly_hash_functions::anemoi::anemoi_koalabear::{
-    ANEMOI_KOALABEAR_2_PARAMS, ANEMOI_KOALABEAR_4_PARAMS,
-};
-use sok_zk_friendly_hash_functions::anemoi::anemoi_mersenne31::{
-    ANEMOI_MERSENNE31_2_PARAMS, ANEMOI_MERSENNE31_4_PARAMS,
+use sok_zk_friendly_hash_functions::anemoi::instances::{
+    ANEMOI_BABYBEAR_16_PARAMS, ANEMOI_BABYBEAR_24_PARAMS, ANEMOI_BLS12_381_2_PARAMS,
+    ANEMOI_BN254_2_PARAMS, ANEMOI_GOLDILOCKS_8_PARAMS, ANEMOI_GOLDILOCKS_12_PARAMS,
+    ANEMOI_KOALABEAR_16_PARAMS, ANEMOI_KOALABEAR_24_PARAMS, ANEMOI_MERSENNE31_16_PARAMS,
+    ANEMOI_MERSENNE31_24_PARAMS,
 };
 use sok_zk_friendly_hash_functions::fields::{FieldElement, PrimeFieldWords};
 use sok_zk_friendly_hash_functions::griffin::griffin::Griffin;
-use sok_zk_friendly_hash_functions::griffin::griffin_babybear::{
-    GRIFFIN_BABYBEAR_16_PARAMS, GRIFFIN_BABYBEAR_24_PARAMS,
-};
-use sok_zk_friendly_hash_functions::griffin::griffin_bls12_381::{
-    GRIFFIN_BLS12_381_3_PARAMS, GRIFFIN_BLS12_381_4_PARAMS,
-};
-use sok_zk_friendly_hash_functions::griffin::griffin_bn254::{
-    GRIFFIN_BN254_3_PARAMS, GRIFFIN_BN254_4_PARAMS,
-};
-use sok_zk_friendly_hash_functions::griffin::griffin_goldilocks::{
-    GRIFFIN_GOLDILOCKS_8_PARAMS, GRIFFIN_GOLDILOCKS_12_PARAMS,
-};
-use sok_zk_friendly_hash_functions::griffin::griffin_koalabear::{
-    GRIFFIN_KOALABEAR_16_PARAMS, GRIFFIN_KOALABEAR_24_PARAMS,
-};
-use sok_zk_friendly_hash_functions::griffin::griffin_mersenne31::{
-    GRIFFIN_MERSENNE31_16_PARAMS, GRIFFIN_MERSENNE31_24_PARAMS,
+use sok_zk_friendly_hash_functions::griffin::instances::{
+    GRIFFIN_BLS12_381_3_PARAMS, GRIFFIN_BN254_3_PARAMS, GRIFFIN_GOLDILOCKS_8_PARAMS,
+    GRIFFIN_GOLDILOCKS_12_PARAMS,
 };
 use sok_zk_friendly_hash_functions::gmimc_erf::gmimc_erf::GmimcErf;
-use sok_zk_friendly_hash_functions::gmimc_erf::gmimc_erf_babybear::{
+use sok_zk_friendly_hash_functions::gmimc_erf::instances::{
+    GMIMC_ERF_ALPHA3_BABYBEAR_16_PARAMS, GMIMC_ERF_ALPHA3_BABYBEAR_24_PARAMS,
+    GMIMC_ERF_ALPHA3_BLS12_381_2_PARAMS, GMIMC_ERF_ALPHA3_BLS12_381_3_PARAMS,
+    GMIMC_ERF_ALPHA3_BN254_2_PARAMS, GMIMC_ERF_ALPHA3_BN254_3_PARAMS,
+    GMIMC_ERF_ALPHA3_GOLDILOCKS_8_PARAMS, GMIMC_ERF_ALPHA3_GOLDILOCKS_12_PARAMS,
+    GMIMC_ERF_ALPHA3_KOALABEAR_16_PARAMS, GMIMC_ERF_ALPHA3_KOALABEAR_24_PARAMS,
+    GMIMC_ERF_ALPHA3_MERSENNE31_16_PARAMS, GMIMC_ERF_ALPHA3_MERSENNE31_24_PARAMS,
     GMIMC_ERF_BABYBEAR_16_PARAMS, GMIMC_ERF_BABYBEAR_24_PARAMS,
-};
-use sok_zk_friendly_hash_functions::gmimc_erf::gmimc_erf_bls12_381::{
     GMIMC_ERF_BLS12_381_2_PARAMS, GMIMC_ERF_BLS12_381_3_PARAMS,
-};
-use sok_zk_friendly_hash_functions::gmimc_erf::gmimc_erf_bn254::{
     GMIMC_ERF_BN254_2_PARAMS, GMIMC_ERF_BN254_3_PARAMS,
-};
-use sok_zk_friendly_hash_functions::gmimc_erf::gmimc_erf_felt252::{
-    GMIMC_ERF_FELT252_2_PARAMS, GMIMC_ERF_FELT252_3_PARAMS,
-};
-use sok_zk_friendly_hash_functions::gmimc_erf::gmimc_erf_goldilocks::{
     GMIMC_ERF_GOLDILOCKS_8_PARAMS, GMIMC_ERF_GOLDILOCKS_12_PARAMS,
-};
-use sok_zk_friendly_hash_functions::gmimc_erf::gmimc_erf_koalabear::{
     GMIMC_ERF_KOALABEAR_16_PARAMS, GMIMC_ERF_KOALABEAR_24_PARAMS,
-};
-use sok_zk_friendly_hash_functions::gmimc_erf::gmimc_erf_mersenne31::{
     GMIMC_ERF_MERSENNE31_16_PARAMS, GMIMC_ERF_MERSENNE31_24_PARAMS,
 };
-use sok_zk_friendly_hash_functions::monolith::monolith::{Monolith31, Monolith64};
-use sok_zk_friendly_hash_functions::monolith::monolith_babybear::{
+use sok_zk_friendly_hash_functions::monolith::instances::{
     MONOLITH_BABYBEAR_16_PARAMS, MONOLITH_BABYBEAR_24_PARAMS,
-};
-use sok_zk_friendly_hash_functions::monolith::monolith_goldilocks::{
-    MONOLITH_GOLDILOCKS_8_PARAMS, MONOLITH_GOLDILOCKS_12_PARAMS,
-};
-use sok_zk_friendly_hash_functions::monolith::monolith_koalabear::{
+    MONOLITH_GOLDILOCKS_12_PARAMS, MONOLITH_GOLDILOCKS_8_PARAMS,
     MONOLITH_KOALABEAR_16_PARAMS, MONOLITH_KOALABEAR_24_PARAMS,
-};
-use sok_zk_friendly_hash_functions::monolith::monolith_mersenne31::{
     MONOLITH_MERSENNE31_16_PARAMS, MONOLITH_MERSENNE31_24_PARAMS,
 };
-use sok_zk_friendly_hash_functions::monolith::monolith_params::{
-    MonolithField32, MonolithField64,
-};
+use sok_zk_friendly_hash_functions::monolith::monolith::{Monolith31, Monolith64};
+use sok_zk_friendly_hash_functions::monolith::monolith_params::{MonolithField32, MonolithField64};
 use sok_zk_friendly_hash_functions::neptune::neptune::Neptune;
-use sok_zk_friendly_hash_functions::neptune::neptune_babybear::{
-    NEPTUNE_BABYBEAR_16_PARAMS, NEPTUNE_BABYBEAR_24_PARAMS,
+use sok_zk_friendly_hash_functions::neptune::instances::{
+    NEPTUNE_BABYBEAR_16_PARAMS, NEPTUNE_BABYBEAR_24_PARAMS, NEPTUNE_BLS12_381_2_PARAMS,
+    NEPTUNE_BN254_2_PARAMS, NEPTUNE_GOLDILOCKS_8_PARAMS, NEPTUNE_GOLDILOCKS_12_PARAMS,
+    NEPTUNE_KOALABEAR_16_PARAMS, NEPTUNE_KOALABEAR_24_PARAMS, NEPTUNE_MERSENNE31_16_PARAMS,
+    NEPTUNE_MERSENNE31_24_PARAMS,
 };
-use sok_zk_friendly_hash_functions::neptune::neptune_bls12_381::{
-    NEPTUNE_BLS12_381_2_PARAMS, NEPTUNE_BLS12_381_4_PARAMS,
+use sok_zk_friendly_hash_functions::polocolo::instances::{
+    POLOCOLO_BLS12_381_3_PARAMS, POLOCOLO_BN254_3_PARAMS,
 };
-use sok_zk_friendly_hash_functions::neptune::neptune_bn254::{
-    NEPTUNE_BN254_2_PARAMS, NEPTUNE_BN254_4_PARAMS,
-};
-use sok_zk_friendly_hash_functions::neptune::neptune_goldilocks::{
-    NEPTUNE_GOLDILOCKS_8_PARAMS, NEPTUNE_GOLDILOCKS_12_PARAMS,
-};
-use sok_zk_friendly_hash_functions::neptune::neptune_koalabear::{
-    NEPTUNE_KOALABEAR_16_PARAMS, NEPTUNE_KOALABEAR_24_PARAMS,
-};
-use sok_zk_friendly_hash_functions::neptune::neptune_mersenne31::{
-    NEPTUNE_MERSENNE31_16_PARAMS, NEPTUNE_MERSENNE31_24_PARAMS,
-};
+use sok_zk_friendly_hash_functions::polocolo::polocolo::Polocolo;
 use sok_zk_friendly_hash_functions::poseidon::poseidon::Poseidon;
-use sok_zk_friendly_hash_functions::poseidon::poseidon_babybear::{
-    POSEIDON_BABYBEAR_16_PARAMS, POSEIDON_BABYBEAR_24_PARAMS,
-};
-use sok_zk_friendly_hash_functions::poseidon::poseidon_bls12_381::{
-    POSEIDON_BLS12_381_2_PARAMS, POSEIDON_BLS12_381_3_PARAMS,
-};
-use sok_zk_friendly_hash_functions::poseidon::poseidon_bn254::{
-    POSEIDON_BN254_2_PARAMS, POSEIDON_BN254_3_PARAMS,
-};
-use sok_zk_friendly_hash_functions::poseidon::poseidon_felt252::{
-    POSEIDON_FELT252_2_PARAMS, POSEIDON_FELT252_3_PARAMS,
-};
-use sok_zk_friendly_hash_functions::poseidon::poseidon_goldilocks::{
-    POSEIDON_GOLDILOCKS_8_PARAMS, POSEIDON_GOLDILOCKS_12_PARAMS,
-};
-use sok_zk_friendly_hash_functions::poseidon::poseidon_koalabear::{
-    POSEIDON_KOALABEAR_16_PARAMS, POSEIDON_KOALABEAR_24_PARAMS,
-};
-use sok_zk_friendly_hash_functions::poseidon::poseidon_mersenne31::{
-    POSEIDON_MERSENNE31_16_PARAMS, POSEIDON_MERSENNE31_24_PARAMS,
+use sok_zk_friendly_hash_functions::poseidon::instances::{
+    POSEIDON_BABYBEAR_16_PARAMS, POSEIDON_BABYBEAR_24_PARAMS, POSEIDON_BLS12_381_2_PARAMS,
+    POSEIDON_BLS12_381_3_PARAMS, POSEIDON_BN254_2_PARAMS, POSEIDON_BN254_3_PARAMS,
+    POSEIDON_GOLDILOCKS_8_PARAMS, POSEIDON_GOLDILOCKS_12_PARAMS, POSEIDON_KOALABEAR_16_PARAMS,
+    POSEIDON_KOALABEAR_24_PARAMS, POSEIDON_MERSENNE31_16_PARAMS,
+    POSEIDON_MERSENNE31_24_PARAMS,
 };
 use sok_zk_friendly_hash_functions::poseidon2::poseidon2::Poseidon2;
-use sok_zk_friendly_hash_functions::poseidon2::poseidon2_babybear::{
-    POSEIDON2_BABYBEAR_16_PARAMS, POSEIDON2_BABYBEAR_24_PARAMS,
-};
-use sok_zk_friendly_hash_functions::poseidon2::poseidon2_bls12_381::{
-    POSEIDON2_BLS12_381_2_PARAMS, POSEIDON2_BLS12_381_3_PARAMS,
-};
-use sok_zk_friendly_hash_functions::poseidon2::poseidon2_bn254::{
-    POSEIDON2_BN254_2_PARAMS, POSEIDON2_BN254_3_PARAMS,
-};
-use sok_zk_friendly_hash_functions::poseidon2::poseidon2_felt252::{
-    POSEIDON2_FELT252_2_PARAMS, POSEIDON2_FELT252_3_PARAMS,
-};
-use sok_zk_friendly_hash_functions::poseidon2::poseidon2_goldilocks::{
+use sok_zk_friendly_hash_functions::poseidon2::instances::{
+    POSEIDON2_BABYBEAR_16_PARAMS, POSEIDON2_BABYBEAR_24_PARAMS, POSEIDON2_BLS12_381_2_PARAMS,
+    POSEIDON2_BLS12_381_3_PARAMS, POSEIDON2_BN254_2_PARAMS, POSEIDON2_BN254_3_PARAMS,
     POSEIDON2_GOLDILOCKS_8_PARAMS, POSEIDON2_GOLDILOCKS_12_PARAMS,
-};
-use sok_zk_friendly_hash_functions::poseidon2::poseidon2_koalabear::{
     POSEIDON2_KOALABEAR_16_PARAMS, POSEIDON2_KOALABEAR_24_PARAMS,
-};
-use sok_zk_friendly_hash_functions::poseidon2::poseidon2_mersenne31::{
     POSEIDON2_MERSENNE31_16_PARAMS, POSEIDON2_MERSENNE31_24_PARAMS,
 };
 use sok_zk_friendly_hash_functions::reinforced_concrete::reinforced_concrete::ReinforcedConcrete;
-use sok_zk_friendly_hash_functions::reinforced_concrete::reinforced_concrete_babybear::RC_BABYBEAR_PARAMS;
-use sok_zk_friendly_hash_functions::reinforced_concrete::reinforced_concrete_bls12_381::RC_BLS12_381_PARAMS;
-use sok_zk_friendly_hash_functions::reinforced_concrete::reinforced_concrete_bn254::RC_BN254_PARAMS;
-use sok_zk_friendly_hash_functions::reinforced_concrete::reinforced_concrete_goldilocks::RC_GOLDILOCKS_PARAMS;
-use sok_zk_friendly_hash_functions::reinforced_concrete::reinforced_concrete_koalabear::RC_KOALABEAR_PARAMS;
-use sok_zk_friendly_hash_functions::reinforced_concrete::reinforced_concrete_mersenne31::RC_MERSENNE31_PARAMS;
-use sok_zk_friendly_hash_functions::rescue::rescue::Rescue;
-use sok_zk_friendly_hash_functions::rescue::rescue_babybear::{
-    RESCUE_BABYBEAR_16_PARAMS, RESCUE_BABYBEAR_24_PARAMS,
+use sok_zk_friendly_hash_functions::reinforced_concrete::instances::{
+    REINFORCED_CONCRETE_BLS12_381_3_PARAMS, REINFORCED_CONCRETE_BN254_3_PARAMS,
 };
-use sok_zk_friendly_hash_functions::rescue::rescue_bls12_381::{
-    RESCUE_BLS12_381_2_PARAMS, RESCUE_BLS12_381_3_PARAMS,
+use sok_zk_friendly_hash_functions::rescueprime::instances::{
+    RESCUE_PRIME_BLS12_381_2_PARAMS, RESCUE_PRIME_BLS12_381_3_PARAMS,
+    RESCUE_PRIME_BN254_3_PARAMS, RESCUE_PRIME_GOLDILOCKS_8_PARAMS,
+    RESCUE_PRIME_GOLDILOCKS_12_PARAMS,
 };
-use sok_zk_friendly_hash_functions::rescue::rescue_bn254::{
-    RESCUE_BN254_2_PARAMS, RESCUE_BN254_3_PARAMS,
+use sok_zk_friendly_hash_functions::rescueprime::rescue_prime::RescuePrime;
+use sok_zk_friendly_hash_functions::skyscraper::instances::{
+    SKYSCRAPER_BLS12_381_2_PARAMS, SKYSCRAPER_BLS12_381_3_PARAMS, SKYSCRAPER_BN254_2_PARAMS,
+    SKYSCRAPER_BN254_3_PARAMS,
 };
-use sok_zk_friendly_hash_functions::rescue::rescue_felt252::{
-    RESCUE_FELT252_2_PARAMS, RESCUE_FELT252_3_PARAMS,
-};
-use sok_zk_friendly_hash_functions::rescue::rescue_goldilocks::{
-    RESCUE_GOLDILOCKS_8_PARAMS, RESCUE_GOLDILOCKS_12_PARAMS,
-};
-use sok_zk_friendly_hash_functions::rescue::rescue_koalabear::{
-    RESCUE_KOALABEAR_16_PARAMS, RESCUE_KOALABEAR_24_PARAMS,
-};
-use sok_zk_friendly_hash_functions::rescue::rescue_mersenne31::{
-    RESCUE_MERSENNE31_16_PARAMS, RESCUE_MERSENNE31_24_PARAMS,
-};
+use sok_zk_friendly_hash_functions::skyscraper::skyscraper::Skyscraper;
 use sok_zk_friendly_hash_functions::tip4::tip4::Tip4;
-use sok_zk_friendly_hash_functions::tip4::tip4_goldilocks::{
-    TIP4_GOLDILOCKS_PARAMS, TIP4P_GOLDILOCKS_PARAMS,
-};
-use sok_zk_friendly_hash_functions::tip4::tip4_params::Tip4Field;
+use sok_zk_friendly_hash_functions::tip4::instances::TIP4P_GOLDILOCKS_PARAMS;
+use sok_zk_friendly_hash_functions::tip4::tip4::Tip4Field;
 use sok_zk_friendly_hash_functions::tip5::tip5::Tip5;
-use sok_zk_friendly_hash_functions::tip5::tip5_goldilocks::TIP5_GOLDILOCKS_PARAMS;
-use sok_zk_friendly_hash_functions::tip5::tip5_params::Tip5Field;
+use sok_zk_friendly_hash_functions::tip5::instances::TIP5_GOLDILOCKS_PARAMS;
+use sok_zk_friendly_hash_functions::tip5::tip5::Tip5Field;
+use sha2::{Digest, Sha256};
+use sha3::Keccak256;
 use std::hint::black_box;
 use std::time::Instant;
 
@@ -183,54 +92,36 @@ const ITERS: usize = 1 << 14;
 fn main() {
     println!("iters = {ITERS}");
 
-    println!("\n== Poseidon (state ~512) ==");
+    println!("\n== Poseidon (~256-bit fields) ==");
     bench_poseidon("Poseidon BN254 t=2", &Poseidon::new(&POSEIDON_BN254_2_PARAMS), ITERS);
+    bench_poseidon("Poseidon BN254 t=3", &Poseidon::new(&POSEIDON_BN254_3_PARAMS), ITERS);
     bench_poseidon(
         "Poseidon BLS12-381 t=2",
         &Poseidon::new(&POSEIDON_BLS12_381_2_PARAMS),
         ITERS,
     );
     bench_poseidon(
-        "Poseidon felt252 t=2",
-        &Poseidon::new(&POSEIDON_FELT252_2_PARAMS),
+        "Poseidon BLS12-381 t=3",
+        &Poseidon::new(&POSEIDON_BLS12_381_3_PARAMS),
         ITERS,
     );
+
+    println!("\n== Poseidon (~64-bit field) ==");
     bench_poseidon(
         "Poseidon Goldilocks t=8",
         &Poseidon::new(&POSEIDON_GOLDILOCKS_8_PARAMS),
         ITERS,
     );
     bench_poseidon(
-        "Poseidon BabyBear t=16",
-        &Poseidon::new(&POSEIDON_BABYBEAR_16_PARAMS),
-        ITERS,
-    );
-    bench_poseidon(
-        "Poseidon KoalaBear t=16",
-        &Poseidon::new(&POSEIDON_KOALABEAR_16_PARAMS),
-        ITERS,
-    );
-    bench_poseidon(
-        "Poseidon Mersenne31 t=16",
-        &Poseidon::new(&POSEIDON_MERSENNE31_16_PARAMS),
+        "Poseidon Goldilocks t=12",
+        &Poseidon::new(&POSEIDON_GOLDILOCKS_12_PARAMS),
         ITERS,
     );
 
-    println!("\n== Poseidon (state ~768) ==");
-    bench_poseidon("Poseidon BN254 t=3", &Poseidon::new(&POSEIDON_BN254_3_PARAMS), ITERS);
+    println!("\n== Poseidon (~31-bit fields) ==");
     bench_poseidon(
-        "Poseidon BLS12-381 t=3",
-        &Poseidon::new(&POSEIDON_BLS12_381_3_PARAMS),
-        ITERS,
-    );
-    bench_poseidon(
-        "Poseidon felt252 t=3",
-        &Poseidon::new(&POSEIDON_FELT252_3_PARAMS),
-        ITERS,
-    );
-    bench_poseidon(
-        "Poseidon Goldilocks t=12",
-        &Poseidon::new(&POSEIDON_GOLDILOCKS_12_PARAMS),
+        "Poseidon BabyBear t=16",
+        &Poseidon::new(&POSEIDON_BABYBEAR_16_PARAMS),
         ITERS,
     );
     bench_poseidon(
@@ -239,8 +130,18 @@ fn main() {
         ITERS,
     );
     bench_poseidon(
+        "Poseidon KoalaBear t=16",
+        &Poseidon::new(&POSEIDON_KOALABEAR_16_PARAMS),
+        ITERS,
+    );
+    bench_poseidon(
         "Poseidon KoalaBear t=24",
         &Poseidon::new(&POSEIDON_KOALABEAR_24_PARAMS),
+        ITERS,
+    );
+    bench_poseidon(
+        "Poseidon Mersenne31 t=16",
+        &Poseidon::new(&POSEIDON_MERSENNE31_16_PARAMS),
         ITERS,
     );
     bench_poseidon(
@@ -249,10 +150,15 @@ fn main() {
         ITERS,
     );
 
-    println!("\n== Poseidon2 (state ~512) ==");
+    println!("\n== Poseidon2 (~256-bit fields) ==");
     bench_poseidon2(
         "Poseidon2 BN254 t=2",
         &Poseidon2::new(&POSEIDON2_BN254_2_PARAMS),
+        ITERS,
+    );
+    bench_poseidon2(
+        "Poseidon2 BN254 t=3",
+        &Poseidon2::new(&POSEIDON2_BN254_3_PARAMS),
         ITERS,
     );
     bench_poseidon2(
@@ -261,50 +167,27 @@ fn main() {
         ITERS,
     );
     bench_poseidon2(
-        "Poseidon2 felt252 t=2",
-        &Poseidon2::new(&POSEIDON2_FELT252_2_PARAMS),
+        "Poseidon2 BLS12-381 t=3",
+        &Poseidon2::new(&POSEIDON2_BLS12_381_3_PARAMS),
         ITERS,
     );
+
+    println!("\n== Poseidon2 (~64-bit field) ==");
     bench_poseidon2(
         "Poseidon2 Goldilocks t=8",
         &Poseidon2::new(&POSEIDON2_GOLDILOCKS_8_PARAMS),
         ITERS,
     );
     bench_poseidon2(
-        "Poseidon2 BabyBear t=16",
-        &Poseidon2::new(&POSEIDON2_BABYBEAR_16_PARAMS),
-        ITERS,
-    );
-    bench_poseidon2(
-        "Poseidon2 KoalaBear t=16",
-        &Poseidon2::new(&POSEIDON2_KOALABEAR_16_PARAMS),
-        ITERS,
-    );
-    bench_poseidon2(
-        "Poseidon2 Mersenne31 t=16",
-        &Poseidon2::new(&POSEIDON2_MERSENNE31_16_PARAMS),
+        "Poseidon2 Goldilocks t=12",
+        &Poseidon2::new(&POSEIDON2_GOLDILOCKS_12_PARAMS),
         ITERS,
     );
 
-    println!("\n== Poseidon2 (state ~768) ==");
+    println!("\n== Poseidon2 (~31-bit fields) ==");
     bench_poseidon2(
-        "Poseidon2 BN254 t=3",
-        &Poseidon2::new(&POSEIDON2_BN254_3_PARAMS),
-        ITERS,
-    );
-    bench_poseidon2(
-        "Poseidon2 BLS12-381 t=3",
-        &Poseidon2::new(&POSEIDON2_BLS12_381_3_PARAMS),
-        ITERS,
-    );
-    bench_poseidon2(
-        "Poseidon2 felt252 t=3",
-        &Poseidon2::new(&POSEIDON2_FELT252_3_PARAMS),
-        ITERS,
-    );
-    bench_poseidon2(
-        "Poseidon2 Goldilocks t=12",
-        &Poseidon2::new(&POSEIDON2_GOLDILOCKS_12_PARAMS),
+        "Poseidon2 BabyBear t=16",
+        &Poseidon2::new(&POSEIDON2_BABYBEAR_16_PARAMS),
         ITERS,
     );
     bench_poseidon2(
@@ -313,8 +196,18 @@ fn main() {
         ITERS,
     );
     bench_poseidon2(
+        "Poseidon2 KoalaBear t=16",
+        &Poseidon2::new(&POSEIDON2_KOALABEAR_16_PARAMS),
+        ITERS,
+    );
+    bench_poseidon2(
         "Poseidon2 KoalaBear t=24",
         &Poseidon2::new(&POSEIDON2_KOALABEAR_24_PARAMS),
+        ITERS,
+    );
+    bench_poseidon2(
+        "Poseidon2 Mersenne31 t=16",
+        &Poseidon2::new(&POSEIDON2_MERSENNE31_16_PARAMS),
         ITERS,
     );
     bench_poseidon2(
@@ -323,239 +216,227 @@ fn main() {
         ITERS,
     );
 
-    println!("\n== Rescue (state ~512) ==");
-    bench_rescue("Rescue BN254 t=2", &Rescue::new(&RESCUE_BN254_2_PARAMS), ITERS);
+    println!("\n== RescuePrime (state ~512) ==");
     bench_rescue(
-        "Rescue BLS12-381 t=2",
-        &Rescue::new(&RESCUE_BLS12_381_2_PARAMS),
+        "RescuePrime BLS12-381 t=2",
+        &RescuePrime::new(&RESCUE_PRIME_BLS12_381_2_PARAMS),
         ITERS,
     );
     bench_rescue(
-        "Rescue felt252 t=2",
-        &Rescue::new(&RESCUE_FELT252_2_PARAMS),
-        ITERS,
-    );
-    bench_rescue(
-        "Rescue Goldilocks t=8",
-        &Rescue::new(&RESCUE_GOLDILOCKS_8_PARAMS),
-        ITERS,
-    );
-    bench_rescue(
-        "Rescue BabyBear t=16",
-        &Rescue::new(&RESCUE_BABYBEAR_16_PARAMS),
-        ITERS,
-    );
-    bench_rescue(
-        "Rescue KoalaBear t=16",
-        &Rescue::new(&RESCUE_KOALABEAR_16_PARAMS),
-        ITERS,
-    );
-    bench_rescue(
-        "Rescue Mersenne31 t=16",
-        &Rescue::new(&RESCUE_MERSENNE31_16_PARAMS),
+        "RescuePrime Goldilocks t=8",
+        &RescuePrime::new(&RESCUE_PRIME_GOLDILOCKS_8_PARAMS),
         ITERS,
     );
 
-    println!("\n== Rescue (state ~768) ==");
-    bench_rescue("Rescue BN254 t=3", &Rescue::new(&RESCUE_BN254_3_PARAMS), ITERS);
+    println!("\n== RescuePrime (state ~768) ==");
     bench_rescue(
-        "Rescue BLS12-381 t=3",
-        &Rescue::new(&RESCUE_BLS12_381_3_PARAMS),
+        "RescuePrime BN254 t=3",
+        &RescuePrime::new(&RESCUE_PRIME_BN254_3_PARAMS),
         ITERS,
     );
     bench_rescue(
-        "Rescue felt252 t=3",
-        &Rescue::new(&RESCUE_FELT252_3_PARAMS),
+        "RescuePrime BLS12-381 t=3",
+        &RescuePrime::new(&RESCUE_PRIME_BLS12_381_3_PARAMS),
         ITERS,
     );
     bench_rescue(
-        "Rescue Goldilocks t=12",
-        &Rescue::new(&RESCUE_GOLDILOCKS_12_PARAMS),
-        ITERS,
-    );
-    bench_rescue(
-        "Rescue BabyBear t=24",
-        &Rescue::new(&RESCUE_BABYBEAR_24_PARAMS),
-        ITERS,
-    );
-    bench_rescue(
-        "Rescue KoalaBear t=24",
-        &Rescue::new(&RESCUE_KOALABEAR_24_PARAMS),
-        ITERS,
-    );
-    bench_rescue(
-        "Rescue Mersenne31 t=24",
-        &Rescue::new(&RESCUE_MERSENNE31_24_PARAMS),
+        "RescuePrime Goldilocks t=12",
+        &RescuePrime::new(&RESCUE_PRIME_GOLDILOCKS_12_PARAMS),
         ITERS,
     );
 
-    println!("\n== Anemoi (width 2) ==");
-    bench_anemoi("Anemoi BN254 w=2", &Anemoi::new(&ANEMOI_BN254_2_PARAMS), ITERS);
+    println!("\n== Anemoi (~256-bit fields) ==");
+    bench_anemoi("Anemoi BN254 t=2", &Anemoi::new(&ANEMOI_BN254_2_PARAMS), ITERS);
     bench_anemoi(
-        "Anemoi BLS12-381 w=2",
+        "Anemoi BLS12-381 t=2",
         &Anemoi::new(&ANEMOI_BLS12_381_2_PARAMS),
         ITERS,
     );
+
+    println!("\n== Anemoi (~64-bit field) ==");
     bench_anemoi(
-        "Anemoi Goldilocks w=2",
-        &Anemoi::new(&ANEMOI_GOLDILOCKS_2_PARAMS),
+        "Anemoi Goldilocks t=8",
+        &Anemoi::new(&ANEMOI_GOLDILOCKS_8_PARAMS),
         ITERS,
     );
     bench_anemoi(
-        "Anemoi BabyBear w=2",
-        &Anemoi::new(&ANEMOI_BABYBEAR_2_PARAMS),
-        ITERS,
-    );
-    bench_anemoi(
-        "Anemoi KoalaBear w=2",
-        &Anemoi::new(&ANEMOI_KOALABEAR_2_PARAMS),
-        ITERS,
-    );
-    bench_anemoi(
-        "Anemoi Mersenne31 w=2",
-        &Anemoi::new(&ANEMOI_MERSENNE31_2_PARAMS),
+        "Anemoi Goldilocks t=12",
+        &Anemoi::new(&ANEMOI_GOLDILOCKS_12_PARAMS),
         ITERS,
     );
 
-    println!("\n== Anemoi (width 4) ==");
+    println!("\n== Anemoi (~31-bit fields) ==");
     bench_anemoi(
-        "Anemoi BN254 w=4",
-        &Anemoi::new(&ANEMOI_BN254_4_PARAMS),
+        "Anemoi BabyBear t=16",
+        &Anemoi::new(&ANEMOI_BABYBEAR_16_PARAMS),
         ITERS,
     );
     bench_anemoi(
-        "Anemoi BLS12-381 w=4",
-        &Anemoi::new(&ANEMOI_BLS12_381_4_PARAMS),
+        "Anemoi BabyBear t=24",
+        &Anemoi::new(&ANEMOI_BABYBEAR_24_PARAMS),
         ITERS,
     );
     bench_anemoi(
-        "Anemoi Goldilocks w=4",
-        &Anemoi::new(&ANEMOI_GOLDILOCKS_4_PARAMS),
+        "Anemoi KoalaBear t=16",
+        &Anemoi::new(&ANEMOI_KOALABEAR_16_PARAMS),
         ITERS,
     );
     bench_anemoi(
-        "Anemoi BabyBear w=4",
-        &Anemoi::new(&ANEMOI_BABYBEAR_4_PARAMS),
+        "Anemoi KoalaBear t=24",
+        &Anemoi::new(&ANEMOI_KOALABEAR_24_PARAMS),
         ITERS,
     );
     bench_anemoi(
-        "Anemoi KoalaBear w=4",
-        &Anemoi::new(&ANEMOI_KOALABEAR_4_PARAMS),
+        "Anemoi Mersenne31 t=16",
+        &Anemoi::new(&ANEMOI_MERSENNE31_16_PARAMS),
         ITERS,
     );
     bench_anemoi(
-        "Anemoi Mersenne31 w=4",
-        &Anemoi::new(&ANEMOI_MERSENNE31_4_PARAMS),
+        "Anemoi Mersenne31 t=24",
+        &Anemoi::new(&ANEMOI_MERSENNE31_24_PARAMS),
         ITERS,
     );
 
     println!("\n== GMiMC-ERF (state ~512) ==");
     bench_gmimc(
-        "GMiMC-ERF BN254 t=2",
+        "GMiMC-ERF(alpha=2) BN254 t=2",
         &GmimcErf::new(&GMIMC_ERF_BN254_2_PARAMS),
         ITERS,
     );
     bench_gmimc(
-        "GMiMC-ERF BLS12-381 t=2",
+        "GMiMC-ERF(alpha=2) BLS12-381 t=2",
         &GmimcErf::new(&GMIMC_ERF_BLS12_381_2_PARAMS),
         ITERS,
     );
     bench_gmimc(
-        "GMiMC-ERF felt252 t=2",
-        &GmimcErf::new(&GMIMC_ERF_FELT252_2_PARAMS),
-        ITERS,
-    );
-    bench_gmimc(
-        "GMiMC-ERF Goldilocks t=8",
+        "GMiMC-ERF(alpha=2) Goldilocks t=8",
         &GmimcErf::new(&GMIMC_ERF_GOLDILOCKS_8_PARAMS),
         ITERS,
     );
     bench_gmimc(
-        "GMiMC-ERF BabyBear t=16",
+        "GMiMC-ERF(alpha=2) BabyBear t=16",
         &GmimcErf::new(&GMIMC_ERF_BABYBEAR_16_PARAMS),
         ITERS,
     );
     bench_gmimc(
-        "GMiMC-ERF KoalaBear t=16",
+        "GMiMC-ERF(alpha=2) KoalaBear t=16",
         &GmimcErf::new(&GMIMC_ERF_KOALABEAR_16_PARAMS),
         ITERS,
     );
     bench_gmimc(
-        "GMiMC-ERF Mersenne31 t=16",
+        "GMiMC-ERF(alpha=2) Mersenne31 t=16",
         &GmimcErf::new(&GMIMC_ERF_MERSENNE31_16_PARAMS),
         ITERS,
     );
 
     println!("\n== GMiMC-ERF (state ~768) ==");
     bench_gmimc(
-        "GMiMC-ERF BN254 t=3",
+        "GMiMC-ERF(alpha=2) BN254 t=3",
         &GmimcErf::new(&GMIMC_ERF_BN254_3_PARAMS),
         ITERS,
     );
     bench_gmimc(
-        "GMiMC-ERF BLS12-381 t=3",
+        "GMiMC-ERF(alpha=2) BLS12-381 t=3",
         &GmimcErf::new(&GMIMC_ERF_BLS12_381_3_PARAMS),
         ITERS,
     );
     bench_gmimc(
-        "GMiMC-ERF felt252 t=3",
-        &GmimcErf::new(&GMIMC_ERF_FELT252_3_PARAMS),
-        ITERS,
-    );
-    bench_gmimc(
-        "GMiMC-ERF Goldilocks t=12",
+        "GMiMC-ERF(alpha=2) Goldilocks t=12",
         &GmimcErf::new(&GMIMC_ERF_GOLDILOCKS_12_PARAMS),
         ITERS,
     );
     bench_gmimc(
-        "GMiMC-ERF BabyBear t=24",
+        "GMiMC-ERF(alpha=2) BabyBear t=24",
         &GmimcErf::new(&GMIMC_ERF_BABYBEAR_24_PARAMS),
         ITERS,
     );
     bench_gmimc(
-        "GMiMC-ERF KoalaBear t=24",
+        "GMiMC-ERF(alpha=2) KoalaBear t=24",
         &GmimcErf::new(&GMIMC_ERF_KOALABEAR_24_PARAMS),
         ITERS,
     );
     bench_gmimc(
-        "GMiMC-ERF Mersenne31 t=24",
+        "GMiMC-ERF(alpha=2) Mersenne31 t=24",
         &GmimcErf::new(&GMIMC_ERF_MERSENNE31_24_PARAMS),
         ITERS,
     );
 
-    println!("\n== Griffin (state ~512) ==");
+    println!("\n== GMiMC-ERF(alpha=3) (state ~512) ==");
+    bench_gmimc(
+        "GMiMC-ERF(alpha=3) BN254 t=2",
+        &GmimcErf::new(&GMIMC_ERF_ALPHA3_BN254_2_PARAMS),
+        ITERS,
+    );
+    bench_gmimc(
+        "GMiMC-ERF(alpha=3) BLS12-381 t=2",
+        &GmimcErf::new(&GMIMC_ERF_ALPHA3_BLS12_381_2_PARAMS),
+        ITERS,
+    );
+    bench_gmimc(
+        "GMiMC-ERF(alpha=3) Goldilocks t=8",
+        &GmimcErf::new(&GMIMC_ERF_ALPHA3_GOLDILOCKS_8_PARAMS),
+        ITERS,
+    );
+    bench_gmimc(
+        "GMiMC-ERF(alpha=3) BabyBear t=16",
+        &GmimcErf::new(&GMIMC_ERF_ALPHA3_BABYBEAR_16_PARAMS),
+        ITERS,
+    );
+    bench_gmimc(
+        "GMiMC-ERF(alpha=3) KoalaBear t=16",
+        &GmimcErf::new(&GMIMC_ERF_ALPHA3_KOALABEAR_16_PARAMS),
+        ITERS,
+    );
+    bench_gmimc(
+        "GMiMC-ERF(alpha=3) Mersenne31 t=16",
+        &GmimcErf::new(&GMIMC_ERF_ALPHA3_MERSENNE31_16_PARAMS),
+        ITERS,
+    );
+
+    println!("\n== GMiMC-ERF(alpha=3) (state ~768) ==");
+    bench_gmimc(
+        "GMiMC-ERF(alpha=3) BN254 t=3",
+        &GmimcErf::new(&GMIMC_ERF_ALPHA3_BN254_3_PARAMS),
+        ITERS,
+    );
+    bench_gmimc(
+        "GMiMC-ERF(alpha=3) BLS12-381 t=3",
+        &GmimcErf::new(&GMIMC_ERF_ALPHA3_BLS12_381_3_PARAMS),
+        ITERS,
+    );
+    bench_gmimc(
+        "GMiMC-ERF(alpha=3) Goldilocks t=12",
+        &GmimcErf::new(&GMIMC_ERF_ALPHA3_GOLDILOCKS_12_PARAMS),
+        ITERS,
+    );
+    bench_gmimc(
+        "GMiMC-ERF(alpha=3) BabyBear t=24",
+        &GmimcErf::new(&GMIMC_ERF_ALPHA3_BABYBEAR_24_PARAMS),
+        ITERS,
+    );
+    bench_gmimc(
+        "GMiMC-ERF(alpha=3) KoalaBear t=24",
+        &GmimcErf::new(&GMIMC_ERF_ALPHA3_KOALABEAR_24_PARAMS),
+        ITERS,
+    );
+    bench_gmimc(
+        "GMiMC-ERF(alpha=3) Mersenne31 t=24",
+        &GmimcErf::new(&GMIMC_ERF_ALPHA3_MERSENNE31_24_PARAMS),
+        ITERS,
+    );
+
+    println!("\n== Griffin (~256-bit fields) ==");
     bench_griffin("Griffin BN254 t=3", &Griffin::new(&GRIFFIN_BN254_3_PARAMS), ITERS);
     bench_griffin(
         "Griffin BLS12-381 t=3",
         &Griffin::new(&GRIFFIN_BLS12_381_3_PARAMS),
         ITERS,
     );
+
+    println!("\n== Griffin (~64-bit field) ==");
     bench_griffin(
         "Griffin Goldilocks t=8",
         &Griffin::new(&GRIFFIN_GOLDILOCKS_8_PARAMS),
-        ITERS,
-    );
-    bench_griffin(
-        "Griffin BabyBear t=16",
-        &Griffin::new(&GRIFFIN_BABYBEAR_16_PARAMS),
-        ITERS,
-    );
-    bench_griffin(
-        "Griffin KoalaBear t=16",
-        &Griffin::new(&GRIFFIN_KOALABEAR_16_PARAMS),
-        ITERS,
-    );
-    bench_griffin(
-        "Griffin Mersenne31 t=16",
-        &Griffin::new(&GRIFFIN_MERSENNE31_16_PARAMS),
-        ITERS,
-    );
-
-    println!("\n== Griffin (state ~768) ==");
-    bench_griffin("Griffin BN254 t=4", &Griffin::new(&GRIFFIN_BN254_4_PARAMS), ITERS);
-    bench_griffin(
-        "Griffin BLS12-381 t=4",
-        &Griffin::new(&GRIFFIN_BLS12_381_4_PARAMS),
         ITERS,
     );
     bench_griffin(
@@ -563,34 +444,28 @@ fn main() {
         &Griffin::new(&GRIFFIN_GOLDILOCKS_12_PARAMS),
         ITERS,
     );
-    bench_griffin(
-        "Griffin BabyBear t=24",
-        &Griffin::new(&GRIFFIN_BABYBEAR_24_PARAMS),
-        ITERS,
-    );
-    bench_griffin(
-        "Griffin KoalaBear t=24",
-        &Griffin::new(&GRIFFIN_KOALABEAR_24_PARAMS),
-        ITERS,
-    );
-    bench_griffin(
-        "Griffin Mersenne31 t=24",
-        &Griffin::new(&GRIFFIN_MERSENNE31_24_PARAMS),
-        ITERS,
-    );
 
-    println!("\n== Neptune (state ~512) ==");
+    println!("\n== Neptune (~256-bit fields) ==");
     bench_neptune("Neptune BN254 t=2", &Neptune::new(&NEPTUNE_BN254_2_PARAMS), ITERS);
     bench_neptune(
         "Neptune BLS12-381 t=2",
         &Neptune::new(&NEPTUNE_BLS12_381_2_PARAMS),
         ITERS,
     );
+
+    println!("\n== Neptune (~64-bit field) ==");
     bench_neptune(
         "Neptune Goldilocks t=8",
         &Neptune::new(&NEPTUNE_GOLDILOCKS_8_PARAMS),
         ITERS,
     );
+    bench_neptune(
+        "Neptune Goldilocks t=12",
+        &Neptune::new(&NEPTUNE_GOLDILOCKS_12_PARAMS),
+        ITERS,
+    );
+
+    println!("\n== Neptune (~31-bit fields) ==");
     bench_neptune(
         "Neptune BabyBear t=16",
         &Neptune::new(&NEPTUNE_BABYBEAR_16_PARAMS),
@@ -604,19 +479,6 @@ fn main() {
     bench_neptune(
         "Neptune Mersenne31 t=16",
         &Neptune::new(&NEPTUNE_MERSENNE31_16_PARAMS),
-        ITERS,
-    );
-
-    println!("\n== Neptune (state ~768) ==");
-    bench_neptune("Neptune BN254 t=4", &Neptune::new(&NEPTUNE_BN254_4_PARAMS), ITERS);
-    bench_neptune(
-        "Neptune BLS12-381 t=4",
-        &Neptune::new(&NEPTUNE_BLS12_381_4_PARAMS),
-        ITERS,
-    );
-    bench_neptune(
-        "Neptune Goldilocks t=12",
-        &Neptune::new(&NEPTUNE_GOLDILOCKS_12_PARAMS),
         ITERS,
     );
     bench_neptune(
@@ -635,35 +497,49 @@ fn main() {
         ITERS,
     );
 
-    println!("\n== ReinforcedConcrete (t=3) ==");
+    println!("\n== Polocolo (~256-bit fields) ==");
+    bench_polocolo(
+        "Polocolo BN254 t=3",
+        &Polocolo::new(&POLOCOLO_BN254_3_PARAMS),
+        ITERS,
+    );
+    bench_polocolo(
+        "Polocolo BLS12-381 t=3",
+        &Polocolo::new(&POLOCOLO_BLS12_381_3_PARAMS),
+        ITERS,
+    );
+
+    println!("\n== Skyscraper (~256-bit fields) ==");
+    bench_skyscraper(
+        "Skyscraper BN254 n=2",
+        &Skyscraper::new(&SKYSCRAPER_BN254_2_PARAMS),
+        ITERS,
+    );
+    bench_skyscraper(
+        "Skyscraper BN254 n=3",
+        &Skyscraper::new(&SKYSCRAPER_BN254_3_PARAMS),
+        ITERS,
+    );
+    bench_skyscraper(
+        "Skyscraper BLS12-381 n=2",
+        &Skyscraper::new(&SKYSCRAPER_BLS12_381_2_PARAMS),
+        ITERS,
+    );
+    bench_skyscraper(
+        "Skyscraper BLS12-381 n=3",
+        &Skyscraper::new(&SKYSCRAPER_BLS12_381_3_PARAMS),
+        ITERS,
+    );
+
+    println!("\n== ReinforcedConcrete (state ~762/~765) ==");
     bench_reinforced_concrete(
         "ReinforcedConcrete BN254 t=3",
-        &ReinforcedConcrete::new(&RC_BN254_PARAMS),
+        &ReinforcedConcrete::new(&REINFORCED_CONCRETE_BN254_3_PARAMS),
         ITERS,
     );
     bench_reinforced_concrete(
         "ReinforcedConcrete BLS12-381 t=3",
-        &ReinforcedConcrete::new(&RC_BLS12_381_PARAMS),
-        ITERS,
-    );
-    bench_reinforced_concrete(
-        "ReinforcedConcrete Goldilocks t=3",
-        &ReinforcedConcrete::new(&RC_GOLDILOCKS_PARAMS),
-        ITERS,
-    );
-    bench_reinforced_concrete(
-        "ReinforcedConcrete BabyBear t=3",
-        &ReinforcedConcrete::new(&RC_BABYBEAR_PARAMS),
-        ITERS,
-    );
-    bench_reinforced_concrete(
-        "ReinforcedConcrete KoalaBear t=3",
-        &ReinforcedConcrete::new(&RC_KOALABEAR_PARAMS),
-        ITERS,
-    );
-    bench_reinforced_concrete(
-        "ReinforcedConcrete Mersenne31 t=3",
-        &ReinforcedConcrete::new(&RC_MERSENNE31_PARAMS),
+        &ReinforcedConcrete::new(&REINFORCED_CONCRETE_BLS12_381_3_PARAMS),
         ITERS,
     );
 
@@ -671,6 +547,11 @@ fn main() {
     bench_monolith64(
         "Monolith Goldilocks t=8",
         &Monolith64::new(&MONOLITH_GOLDILOCKS_8_PARAMS),
+        ITERS,
+    );
+    bench_monolith31(
+        "Monolith Mersenne31 t=16",
+        &Monolith31::new(&MONOLITH_MERSENNE31_16_PARAMS),
         ITERS,
     );
     bench_monolith31(
@@ -683,16 +564,16 @@ fn main() {
         &Monolith31::new(&MONOLITH_KOALABEAR_16_PARAMS),
         ITERS,
     );
-    bench_monolith31(
-        "Monolith Mersenne31 t=16",
-        &Monolith31::new(&MONOLITH_MERSENNE31_16_PARAMS),
-        ITERS,
-    );
 
     println!("\n== Monolith (state ~768) ==");
     bench_monolith64(
         "Monolith Goldilocks t=12",
         &Monolith64::new(&MONOLITH_GOLDILOCKS_12_PARAMS),
+        ITERS,
+    );
+    bench_monolith31(
+        "Monolith Mersenne31 t=24",
+        &Monolith31::new(&MONOLITH_MERSENNE31_24_PARAMS),
         ITERS,
     );
     bench_monolith31(
@@ -705,20 +586,10 @@ fn main() {
         &Monolith31::new(&MONOLITH_KOALABEAR_24_PARAMS),
         ITERS,
     );
-    bench_monolith31(
-        "Monolith Mersenne31 t=24",
-        &Monolith31::new(&MONOLITH_MERSENNE31_24_PARAMS),
-        ITERS,
-    );
 
-    println!("\n== Tip4 (Goldilocks) ==");
+    println!("\n== Tip4' (Goldilocks) ==");
     bench_tip4(
-        "Tip4 Goldilocks",
-        &Tip4::new(&TIP4_GOLDILOCKS_PARAMS),
-        ITERS,
-    );
-    bench_tip4(
-        "Tip4p Goldilocks",
+        "Tip4' Goldilocks",
         &Tip4::new(&TIP4P_GOLDILOCKS_PARAMS),
         ITERS,
     );
@@ -729,6 +600,12 @@ fn main() {
         &Tip5::new(&TIP5_GOLDILOCKS_PARAMS),
         ITERS,
     );
+
+    println!("\n== SHA2/Keccak (bytes, baseline) ==");
+    bench_sha256("SHA-256 input=64B", ITERS, 64);
+    bench_keccak256("Keccak-256 input=64B", ITERS, 64);
+    bench_sha256("SHA-256 input=96B", ITERS, 96);
+    bench_keccak256("Keccak-256 input=96B", ITERS, 96);
 }
 
 fn bench_poseidon<F: FieldElement>(label: &str, perm: &Poseidon<F>, iters: usize) {
@@ -761,6 +638,16 @@ fn bench_neptune<F: FieldElement>(label: &str, perm: &Neptune<F>, iters: usize) 
     bench_with_input(label, iters, &input, |inp| perm.permutation(inp));
 }
 
+fn bench_polocolo<F: PrimeFieldWords>(label: &str, perm: &Polocolo<F>, iters: usize) {
+    let input = make_input::<F>(perm.get_t());
+    bench_with_input(label, iters, &input, |inp| perm.permutation(inp));
+}
+
+fn bench_skyscraper<F: PrimeFieldWords>(label: &str, perm: &Skyscraper<F>, iters: usize) {
+    let input = make_input::<F>(2 * perm.get_n());
+    bench_with_input(label, iters, &input, |inp| perm.permutation(inp));
+}
+
 fn bench_reinforced_concrete<F: PrimeFieldWords>(
     label: &str,
     perm: &ReinforcedConcrete<F>,
@@ -790,19 +677,51 @@ fn bench_tip5<F: Tip5Field>(label: &str, perm: &Tip5<F>, iters: usize) {
     bench_with_input(label, iters, &input, |inp| perm.permutation(inp));
 }
 
-fn bench_rescue<F: FieldElement>(label: &str, perm: &Rescue<F>, iters: usize) {
+fn bench_rescue<F: FieldElement>(label: &str, perm: &RescuePrime<F>, iters: usize) {
     let input = make_input::<F>(perm.get_t());
     bench_with_input(label, iters, &input, |inp| perm.permutation(inp));
+}
+
+fn bench_sha256(label: &str, iters: usize, input_len: usize) {
+    let input = make_bytes_input(input_len);
+    bench_with_bytes(label, iters, &input, |inp| Sha256::digest(inp));
+}
+
+fn bench_keccak256(label: &str, iters: usize, input_len: usize) {
+    let input = make_bytes_input(input_len);
+    bench_with_bytes(label, iters, &input, |inp| Keccak256::digest(inp));
 }
 
 fn make_input<F: FieldElement>(t: usize) -> Vec<F> {
     (0..t).map(|i| F::from_u64((i + 1) as u64)).collect()
 }
 
+fn make_bytes_input(len: usize) -> Vec<u8> {
+    (0..len).map(|i| (i as u8).wrapping_add(1)).collect()
+}
+
 fn bench_with_input<F: FieldElement, R, FFn: FnMut(&[F]) -> R>(
     label: &str,
     iters: usize,
     input: &[F],
+    mut f: FFn,
+) {
+    let start = Instant::now();
+    let mut out = None;
+    for _ in 0..iters {
+        out = Some(f(input));
+        black_box(&out);
+    }
+    let elapsed = start.elapsed();
+    let per_ns = elapsed.as_nanos() / iters as u128;
+    println!("{label}: {iters} iters in {elapsed:?} ({per_ns} ns/iter)");
+    black_box(out);
+}
+
+fn bench_with_bytes<R, FFn: FnMut(&[u8]) -> R>(
+    label: &str,
+    iters: usize,
+    input: &[u8],
     mut f: FFn,
 ) {
     let start = Instant::now();

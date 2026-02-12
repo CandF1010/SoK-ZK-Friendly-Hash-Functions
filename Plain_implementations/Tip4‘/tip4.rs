@@ -3,18 +3,18 @@ use crate::fields::goldilocks::Goldilocks;
 use crate::fields::FieldElement;
 use std::sync::Arc;
 
-pub trait Tip5Field: FieldElement {
+pub trait Tip4Field: FieldElement {
     fn to_u64(&self) -> u64;
 }
 
-impl Tip5Field for Goldilocks {
+impl Tip4Field for Goldilocks {
     fn to_u64(&self) -> u64 {
         Goldilocks::to_u64(self)
     }
 }
 
 #[derive(Clone, Debug)]
-pub struct Tip5Params<F: Tip5Field> {
+pub struct Tip4Params<F: Tip4Field> {
     pub(crate) t: usize,
     pub(crate) rounds: usize,
     pub(crate) round_constants: Vec<Vec<F>>,
@@ -24,13 +24,13 @@ pub struct Tip5Params<F: Tip5Field> {
 }
 
 #[derive(Clone, Debug)]
-pub struct Tip5<F: Tip5Field> {
-    pub(crate) params: Arc<Tip5Params<F>>,
+pub struct Tip4<F: Tip4Field> {
+    pub(crate) params: Arc<Tip4Params<F>>,
 }
 
-impl<F: Tip5Field> Tip5<F> {
-    pub fn new(params: &Arc<Tip5Params<F>>) -> Self {
-        Tip5 {
+impl<F: Tip4Field> Tip4<F> {
+    pub fn new(params: &Arc<Tip4Params<F>>) -> Self {
+        Tip4 {
             params: Arc::clone(params),
         }
     }
@@ -99,29 +99,36 @@ impl<F: Tip5Field> Tip5<F> {
 
 #[cfg(test)]
 mod tests {
-    use super::super::instances::TIP5_GOLDILOCKS_PARAMS;
-    use super::Tip5;
+    use super::super::instances::TIP4P_GOLDILOCKS_PARAMS;
+    use super::Tip4;
     use crate::fields::goldilocks::Goldilocks;
     use crate::fields::FieldElement;
 
     #[test]
-    fn permutation_matches_tip5_hash10_reference_vector_0() {
-        let perm = Tip5::new(&TIP5_GOLDILOCKS_PARAMS);
-        let mut input = vec![Goldilocks::from_u64(0); perm.get_t()];
-        for x in input.iter_mut().skip(10) {
-            *x = Goldilocks::from_u64(1);
-        }
-
+    fn permutation_matches_tip4p_winterfell_reference_vector() {
+        let perm = Tip4::new(&TIP4P_GOLDILOCKS_PARAMS);
+        let input: Vec<Goldilocks> = (0..perm.get_t())
+            .map(|i| Goldilocks::from_u64(i as u64))
+            .collect();
         let output = perm.permutation(&input);
+
         let expected = [
-            941080798860502477u64,
-            5295886365985465639u64,
-            14728839126885177993u64,
-            10358449902914633406u64,
-            14220746792122877272u64,
+            8086224146445274039u64,
+            12620228105612859910u64,
+            4429745645163147655u64,
+            12827206290147492018u64,
+            7103575185686863209u64,
+            5938996934280238338u64,
+            7458235737397060283u64,
+            127950926479970750u64,
+            433935175963827303u64,
+            11405496933068372192u64,
+            4026696970861104429u64,
+            6779880475047698803u64,
         ];
 
-        for (got, want) in output.iter().take(expected.len()).zip(expected.iter()) {
+        assert_eq!(output.len(), expected.len());
+        for (got, want) in output.iter().zip(expected.iter()) {
             assert_eq!(got.to_u64(), *want);
         }
     }

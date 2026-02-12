@@ -50,6 +50,34 @@ pub trait FieldElement: Clone + Default + PartialEq + Eq + std::fmt::Debug {
         }
         result
     }
+
+    /// Exponentiation where `exp_words_le` is represented as little-endian 64-bit limbs.
+    fn pow_words_le(&self, exp_words_le: &[u64]) -> Self {
+        let mut result = Self::one();
+        let mut started = false;
+
+        for &word in exp_words_le.iter().rev() {
+            let mut mask = 1u64 << 63;
+            while mask != 0 {
+                if started {
+                    result.square();
+                }
+
+                if (word & mask) != 0 {
+                    if started {
+                        result.mul_assign(self);
+                    } else {
+                        result = self.clone();
+                        started = true;
+                    }
+                }
+
+                mask >>= 1;
+            }
+        }
+
+        result
+    }
 }
 
 pub trait PrimeField: FieldElement {
@@ -64,6 +92,10 @@ pub trait PrimeFieldExt: PrimeField {
 
 pub trait PrimeFieldWords: PrimeFieldExt {
     fn to_words_le(&self) -> [u64; 4];
+
+    fn from_words_le(words: [u64; 4]) -> Self {
+        Self::from_biguint(&biguint_from_limbs_le(&words))
+    }
 }
 
 pub(crate) fn biguint_from_limbs_le(limbs: &[u64]) -> BigUint {
@@ -73,4 +105,13 @@ pub(crate) fn biguint_from_limbs_le(limbs: &[u64]) -> BigUint {
         value += BigUint::from(*limb);
     }
     value
+}
+
+pub(crate) fn biguint_to_limbs_le_4(value: &BigUint) -> [u64; 4] {
+    let mut out = [0u64; 4];
+    let limbs = value.to_u64_digits();
+    for (i, limb) in limbs.iter().enumerate().take(4) {
+        out[i] = *limb;
+    }
+    out
 }

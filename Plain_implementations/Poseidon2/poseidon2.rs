@@ -1,6 +1,50 @@
-use super::poseidon2_params::Poseidon2Params;
 use crate::fields::FieldElement;
 use std::sync::Arc;
+
+#[derive(Clone, Debug)]
+pub struct Poseidon2Params<F: FieldElement> {
+    pub(crate) t: usize,
+    pub(crate) d: u64,
+    pub(crate) rounds_f_beginning: usize,
+    pub(crate) rounds_p: usize,
+    pub(crate) rounds: usize,
+    pub(crate) mat_internal_diag_m_1: Vec<F>,
+    pub(crate) mat_external: Vec<Vec<F>>,
+    pub(crate) mat_internal: Vec<Vec<F>>,
+    pub(crate) round_constants: Vec<Vec<F>>, // [round_idx][state_idx]
+}
+
+impl<F: FieldElement> Poseidon2Params<F> {
+    pub fn new(
+        t: usize,
+        d: u64,
+        rounds_f: usize,
+        rounds_p: usize,
+        mat_external: &[Vec<F>],
+        mat_internal: &[Vec<F>],
+        round_constants: &[Vec<F>],
+    ) -> Self {
+        let mut mat_internal_diag_m_1 = Vec::with_capacity(t);
+        let one = F::one();
+        for (i, row) in mat_internal.iter().enumerate() {
+            let mut diag_m_1 = row[i].clone();
+            diag_m_1.sub_assign(&one);
+            mat_internal_diag_m_1.push(diag_m_1);
+        }
+
+        Poseidon2Params {
+            t,
+            d,
+            rounds_f_beginning: rounds_f / 2,
+            rounds_p,
+            rounds: rounds_f + rounds_p,
+            mat_internal_diag_m_1,
+            mat_external: mat_external.to_owned(),
+            mat_internal: mat_internal.to_owned(),
+            round_constants: round_constants.to_owned(),
+        }
+    }
+}
 
 #[derive(Clone, Debug)]
 pub struct Poseidon2<F: FieldElement> {
@@ -22,34 +66,36 @@ impl<F: FieldElement> Poseidon2<F> {
         let t = self.params.t;
         assert_eq!(input.len(), t);
 
-        let mut current_state = input.to_vec();
+        let mut state = input.to_vec();
 
-        self.matmul_external(&mut current_state);
+        self.matmul_external(&mut state);
 
         for r in 0..self.params.rounds_f_beginning {
-            current_state = self.add_rc(&current_state, &self.params.round_constants[r]);
-            current_state = self.sbox(&current_state);
-            self.matmul_external(&mut current_state);
+            self.add_rc_in_place(&mut state, r);
+            self.sbox_in_place(&mut state);
+            self.matmul_external(&mut state);
         }
 
         let p_end = self.params.rounds_f_beginning + self.params.rounds_p;
         for r in self.params.rounds_f_beginning..p_end {
-            current_state[0].add_assign(&self.params.round_constants[r][0]);
-            current_state[0] = self.sbox_p(&current_state[0]);
-            self.matmul_internal(&mut current_state, &self.params.mat_internal_diag_m_1);
+            state[0].add_assign(&self.params.round_constants[r][0]);
+            state[0] = self.sbox_p(&state[0]);
+            self.matmul_internal(&mut state);
         }
 
         for r in p_end..self.params.rounds {
-            current_state = self.add_rc(&current_state, &self.params.round_constants[r]);
-            current_state = self.sbox(&current_state);
-            self.matmul_external(&mut current_state);
+            self.add_rc_in_place(&mut state, r);
+            self.sbox_in_place(&mut state);
+            self.matmul_external(&mut state);
         }
 
-        current_state
+        state
     }
 
-    fn sbox(&self, input: &[F]) -> Vec<F> {
-        input.iter().map(|el| self.sbox_p(el)).collect()
+    fn sbox_in_place(&self, state: &mut [F]) {
+        for el in state.iter_mut() {
+            *el = self.sbox_p(el);
+        }
     }
 
     fn sbox_p(&self, input: &F) -> F {
@@ -96,7 +142,7 @@ impl<F: FieldElement> Poseidon2<F> {
                 input[1].add_assign(&sum);
                 input[2].add_assign(&sum);
             }
-            4 | 8 | 12 | 16 | 20 | 24 => {
+            8 | 12 | 16 | 24 => {
                 let t4 = t / 4;
                 for i in 0..t4 {
                     let start_index = i * 4;
@@ -143,7 +189,7 @@ impl<F: FieldElement> Poseidon2<F> {
         }
     }
 
-    fn matmul_internal(&self, input: &mut [F], mat_internal_diag_m_1: &[F]) {
+    fn matmul_internal(&self, input: &mut [F]) {
         let t = self.params.t;
 
         match t {
@@ -163,13 +209,13 @@ impl<F: FieldElement> Poseidon2<F> {
                 input[2].double();
                 input[2].add_assign(&sum);
             }
-            4 | 8 | 12 | 16 | 20 | 24 => {
+            8 | 12 | 16 | 24 => {
                 let mut sum = input[0].clone();
                 for el in input.iter().skip(1) {
                     sum.add_assign(el);
                 }
                 for i in 0..input.len() {
-                    input[i].mul_assign(&mat_internal_diag_m_1[i]);
+                    input[i].mul_assign(&self.params.mat_internal_diag_m_1[i]);
                     input[i].add_assign(&sum);
                 }
             }
@@ -177,15 +223,10 @@ impl<F: FieldElement> Poseidon2<F> {
         }
     }
 
-    fn add_rc(&self, input: &[F], rc: &[F]) -> Vec<F> {
-        input
-            .iter()
-            .zip(rc.iter())
-            .map(|(a, b)| {
-                let mut r = a.clone();
-                r.add_assign(b);
-                r
-            })
-            .collect()
+    fn add_rc_in_place(&self, state: &mut [F], round: usize) {
+        let rc = &self.params.round_constants[round];
+        for (x, c) in state.iter_mut().zip(rc.iter()) {
+            x.add_assign(c);
+        }
     }
 }

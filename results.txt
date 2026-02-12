@@ -1,0 +1,156 @@
+iters = 16384
+
+== Poseidon (~256-bit fields) ==
+Poseidon BN254 t=2: 16384 iters in 343.176308ms (20945 ns/iter)
+Poseidon BN254 t=3: 16384 iters in 452.320233ms (27607 ns/iter)
+Poseidon BLS12-381 t=2: 16384 iters in 342.056744ms (20877 ns/iter)
+Poseidon BLS12-381 t=3: 16384 iters in 443.246989ms (27053 ns/iter)
+
+== Poseidon (~64-bit field) ==
+Poseidon Goldilocks t=8: 16384 iters in 698.215143ms (42615 ns/iter)
+Poseidon Goldilocks t=12: 16384 iters in 404.808549ms (24707 ns/iter)
+
+== Poseidon (~31-bit fields) ==
+Poseidon BabyBear t=16: 16384 iters in 296.027205ms (18068 ns/iter)
+Poseidon BabyBear t=24: 16384 iters in 544.293084ms (33221 ns/iter)
+Poseidon KoalaBear t=16: 16384 iters in 226.614324ms (13831 ns/iter)
+Poseidon KoalaBear t=24: 16384 iters in 453.522413ms (27680 ns/iter)
+Poseidon Mersenne31 t=16: 16384 iters in 137.842991ms (8413 ns/iter)
+Poseidon Mersenne31 t=24: 16384 iters in 271.331905ms (16560 ns/iter)
+
+== Poseidon2 (~256-bit fields) ==
+Poseidon2 BN254 t=2: 16384 iters in 200.026864ms (12208 ns/iter)
+Poseidon2 BN254 t=3: 16384 iters in 251.584785ms (15355 ns/iter)
+Poseidon2 BLS12-381 t=2: 16384 iters in 199.242915ms (12160 ns/iter)
+Poseidon2 BLS12-381 t=3: 16384 iters in 231.377172ms (14122 ns/iter)
+
+== Poseidon2 (~64-bit field) ==
+Poseidon2 Goldilocks t=8: 16384 iters in 92.019669ms (5616 ns/iter)
+Poseidon2 Goldilocks t=12: 16384 iters in 141.260473ms (8621 ns/iter)
+
+== Poseidon2 (~31-bit fields) ==
+Poseidon2 BabyBear t=16: 16384 iters in 85.702047ms (5230 ns/iter)
+Poseidon2 BabyBear t=24: 16384 iters in 144.685663ms (8830 ns/iter)
+Poseidon2 KoalaBear t=16: 16384 iters in 77.341835ms (4720 ns/iter)
+Poseidon2 KoalaBear t=24: 16384 iters in 107.47269ms (6559 ns/iter)
+Poseidon2 Mersenne31 t=16: 16384 iters in 48.316724ms (2949 ns/iter)
+Poseidon2 Mersenne31 t=24: 16384 iters in 77.640762ms (4738 ns/iter)
+
+== RescuePrime (state ~512) ==
+RescuePrime BLS12-381 t=2: 16384 iters in 11.32825213s (691421 ns/iter)
+RescuePrime Goldilocks t=8: 16384 iters in 838.497007ms (51177 ns/iter)
+
+== RescuePrime (state ~768) ==
+RescuePrime BN254 t=3: 16384 iters in 10.26377266s (626450 ns/iter)
+RescuePrime BLS12-381 t=3: 16384 iters in 11.340569349s (692173 ns/iter)
+RescuePrime Goldilocks t=12: 16384 iters in 1.350678231s (82438 ns/iter)
+
+== Anemoi (~256-bit fields) ==
+Anemoi BN254 t=2: 16384 iters in 6.13510025s (374456 ns/iter)
+Anemoi BLS12-381 t=2: 16384 iters in 5.540844082s (338186 ns/iter)
+
+== Anemoi (~64-bit field) ==
+Anemoi Goldilocks t=8: 16384 iters in 842.043777ms (51394 ns/iter)
+Anemoi Goldilocks t=12: 16384 iters in 1.090731012s (66572 ns/iter)
+
+== Anemoi (~31-bit fields) ==
+Anemoi BabyBear t=16: 16384 iters in 1.019421687s (62220 ns/iter)
+Anemoi BabyBear t=24: 16384 iters in 1.594966056s (97349 ns/iter)
+Anemoi KoalaBear t=16: 16384 iters in 1.126297271s (68743 ns/iter)
+Anemoi KoalaBear t=24: 16384 iters in 1.458429096s (89015 ns/iter)
+Anemoi Mersenne31 t=16: 16384 iters in 995.099519ms (60736 ns/iter)
+Anemoi Mersenne31 t=24: 16384 iters in 1.119337212s (68318 ns/iter)
+
+== GMiMC-ERF (state ~512) ==
+GMiMC-ERF(alpha=2) BN254 t=2: 16384 iters in 417.4062ms (25476 ns/iter)
+GMiMC-ERF(alpha=2) BLS12-381 t=2: 16384 iters in 419.004231ms (25573 ns/iter)
+GMiMC-ERF(alpha=2) Goldilocks t=8: 16384 iters in 181.287486ms (11064 ns/iter)
+GMiMC-ERF(alpha=2) BabyBear t=16: 16384 iters in 547.375882ms (33409 ns/iter)
+GMiMC-ERF(alpha=2) KoalaBear t=16: 16384 iters in 457.14579ms (27901 ns/iter)
+GMiMC-ERF(alpha=2) Mersenne31 t=16: 16384 iters in 463.468951ms (28287 ns/iter)
+
+== GMiMC-ERF (state ~768) ==
+GMiMC-ERF(alpha=2) BN254 t=3: 16384 iters in 484.944466ms (29598 ns/iter)
+GMiMC-ERF(alpha=2) BLS12-381 t=3: 16384 iters in 502.556933ms (30673 ns/iter)
+GMiMC-ERF(alpha=2) Goldilocks t=12: 16384 iters in 320.036185ms (19533 ns/iter)
+GMiMC-ERF(alpha=2) BabyBear t=24: 16384 iters in 1.282327705s (78267 ns/iter)
+GMiMC-ERF(alpha=2) KoalaBear t=24: 16384 iters in 1.100799555s (67187 ns/iter)
+GMiMC-ERF(alpha=2) Mersenne31 t=24: 16384 iters in 1.095920353s (66889 ns/iter)
+
+== GMiMC-ERF(alpha=3) (state ~512) ==
+GMiMC-ERF(alpha=3) BN254 t=2: 16384 iters in 534.056804ms (32596 ns/iter)
+GMiMC-ERF(alpha=3) BLS12-381 t=2: 16384 iters in 520.113465ms (31745 ns/iter)
+GMiMC-ERF(alpha=3) Goldilocks t=8: 16384 iters in 131.284728ms (8012 ns/iter)
+GMiMC-ERF(alpha=3) BabyBear t=16: 16384 iters in 457.999261ms (27954 ns/iter)
+GMiMC-ERF(alpha=3) KoalaBear t=16: 16384 iters in 503.696915ms (30743 ns/iter)
+GMiMC-ERF(alpha=3) Mersenne31 t=16: 16384 iters in 485.381929ms (29625 ns/iter)
+
+== GMiMC-ERF(alpha=3) (state ~768) ==
+GMiMC-ERF(alpha=3) BN254 t=3: 16384 iters in 566.59198ms (34582 ns/iter)
+GMiMC-ERF(alpha=3) BLS12-381 t=3: 16384 iters in 592.484351ms (36162 ns/iter)
+GMiMC-ERF(alpha=3) Goldilocks t=12: 16384 iters in 293.622162ms (17921 ns/iter)
+GMiMC-ERF(alpha=3) BabyBear t=24: 16384 iters in 1.208476248s (73759 ns/iter)
+GMiMC-ERF(alpha=3) KoalaBear t=24: 16384 iters in 1.131866799s (69083 ns/iter)
+GMiMC-ERF(alpha=3) Mersenne31 t=24: 16384 iters in 1.142112607s (69709 ns/iter)
+
+== Griffin (~256-bit fields) ==
+Griffin BN254 t=3: 16384 iters in 2.942156113s (179574 ns/iter)
+Griffin BLS12-381 t=3: 16384 iters in 3.034702975s (185223 ns/iter)
+
+== Griffin (~64-bit field) ==
+Griffin Goldilocks t=8: 16384 iters in 166.174668ms (10142 ns/iter)
+Griffin Goldilocks t=12: 16384 iters in 168.950527ms (10311 ns/iter)
+
+== Neptune (~256-bit fields) ==
+Neptune BN254 t=2: 16384 iters in 260.59714ms (15905 ns/iter)
+Neptune BLS12-381 t=2: 16384 iters in 275.759473ms (16831 ns/iter)
+
+== Neptune (~64-bit field) ==
+Neptune Goldilocks t=8: 16384 iters in 137.135965ms (8370 ns/iter)
+Neptune Goldilocks t=12: 16384 iters in 224.608417ms (13709 ns/iter)
+
+== Neptune (~31-bit fields) ==
+Neptune BabyBear t=16: 16384 iters in 171.628512ms (10475 ns/iter)
+Neptune KoalaBear t=16: 16384 iters in 171.710517ms (10480 ns/iter)
+Neptune Mersenne31 t=16: 16384 iters in 106.330379ms (6489 ns/iter)
+Neptune BabyBear t=24: 16384 iters in 331.101245ms (20208 ns/iter)
+Neptune KoalaBear t=24: 16384 iters in 327.242257ms (19973 ns/iter)
+Neptune Mersenne31 t=24: 16384 iters in 201.219823ms (12281 ns/iter)
+
+== Polocolo (~256-bit fields) ==
+Polocolo BN254 t=3: 16384 iters in 27.18606337s (1659305 ns/iter)
+Polocolo BLS12-381 t=3: 16384 iters in 9.623285157s (587358 ns/iter)
+
+== Skyscraper (~256-bit fields) ==
+Skyscraper BN254 n=2: 16384 iters in 267.981403ms (16356 ns/iter)
+Skyscraper BN254 n=3: 16384 iters in 389.58425ms (23778 ns/iter)
+Skyscraper BLS12-381 n=2: 16384 iters in 268.18892ms (16368 ns/iter)
+Skyscraper BLS12-381 n=3: 16384 iters in 417.709039ms (25494 ns/iter)
+
+== ReinforcedConcrete (state ~762/~765) ==
+ReinforcedConcrete BN254 t=3: 16384 iters in 146.905572ms (8966 ns/iter)
+ReinforcedConcrete BLS12-381 t=3: 16384 iters in 149.958435ms (9152 ns/iter)
+
+== Monolith (state ~512) ==
+Monolith Goldilocks t=8: 16384 iters in 65.287682ms (3984 ns/iter)
+Monolith Mersenne31 t=16: 16384 iters in 105.218739ms (6422 ns/iter)
+Monolith BabyBear t=16: 16384 iters in 271.373091ms (16563 ns/iter)
+Monolith KoalaBear t=16: 16384 iters in 201.29699ms (12286 ns/iter)
+
+== Monolith (state ~768) ==
+Monolith Goldilocks t=12: 16384 iters in 121.820636ms (7435 ns/iter)
+Monolith Mersenne31 t=24: 16384 iters in 228.645231ms (13955 ns/iter)
+Monolith BabyBear t=24: 16384 iters in 267.715409ms (16340 ns/iter)
+Monolith KoalaBear t=24: 16384 iters in 279.046284ms (17031 ns/iter)
+
+== Tip4' (Goldilocks) ==
+Tip4' Goldilocks: 16384 iters in 87.695341ms (5352 ns/iter)
+
+== Tip5 (Goldilocks) ==
+Tip5 Goldilocks: 16384 iters in 144.442274ms (8816 ns/iter)
+
+== SHA2/Keccak (bytes, baseline) ==
+SHA-256 input=64B: 16384 iters in 3.46966ms (211 ns/iter)
+Keccak-256 input=64B: 16384 iters in 12.295437ms (750 ns/iter)
+SHA-256 input=96B: 16384 iters in 2.375944ms (145 ns/iter)
+Keccak-256 input=96B: 16384 iters in 8.839625ms (539 ns/iter)

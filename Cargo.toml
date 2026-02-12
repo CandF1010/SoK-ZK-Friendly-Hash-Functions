@@ -7,8 +7,17 @@ edition = "2021"
 path = "Plain_implementations/lib.rs"
 
 [dependencies]
+ark-bls12-381 = "0.4"
+ark-bn254 = "0.4"
+ark-ff = "0.4"
 lazy_static = "1.4"
 num-bigint = "0.4"
 num-traits = "0.2"
+p3-baby-bear = { path = "../Plonky3/baby-bear" }
+p3-field = { path = "../Plonky3/field" }
+p3-goldilocks = { path = "../Plonky3/goldilocks" }
+p3-koala-bear = { path = "../Plonky3/koala-bear" }
+p3-mersenne-31 = { path = "../Plonky3/mersenne-31" }
 sha3 = "0.10"
 sha2 = "0.10"
+zkhash = { path = "../Downloads/zkfriendlyhashzoo-master/plain_impls" }

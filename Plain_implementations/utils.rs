@@ -29,23 +29,6 @@ pub(crate) fn modinv(value: &BigUint, modulus: &BigUint) -> BigUint {
     t.try_into().expect("modular inverse must be non-negative")
 }
 
-pub(crate) fn pow_mod_u64(base: &BigUint, mut exp: u64, modulus: &BigUint) -> BigUint {
-    let mut result = BigUint::one();
-    let mut base_power = base % modulus;
-
-    while exp > 0 {
-        if exp & 1 == 1 {
-            result = (result * &base_power) % modulus;
-        }
-        exp >>= 1;
-        if exp > 0 {
-            base_power = (&base_power * &base_power) % modulus;
-        }
-    }
-
-    result
-}
-
 pub(crate) fn pow_biguint<F: FieldElement>(base: &F, exp: &BigUint) -> F {
     let mut result = F::one();
     let mut base_power = base.clone();
