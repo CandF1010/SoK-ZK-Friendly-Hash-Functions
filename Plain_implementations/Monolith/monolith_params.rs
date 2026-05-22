@@ -208,6 +208,78 @@ fn circulant_from_row<F: FieldElement>(row: &[u64], t: usize) -> Vec<Vec<F>> {
         .collect()
 }
 
+// ============================================================
+// Cauchy MDS variants for fair benchmark comparison.
+// Original Monolith uses circulant MDS with NTT/FFT-based
+// O(n log n) multiplication in zkfriendlyhashzoo. These Cauchy
+// variants use generic O(t²) multiplication with a Cauchy
+// matrix, matching the matrix type used by the other hash
+// functions being benchmarked.
+// ============================================================
+
+#[derive(Clone, Debug)]
+pub struct MonolithCauchy64Params<F: MonolithField64> {
+    pub(crate) t: usize,
+    pub(crate) rounds: usize,
+    pub(crate) round_constants: Vec<Vec<F>>,
+    pub(crate) mds: Vec<Vec<F>>,
+    pub(crate) lookup: Vec<u16>,
+}
+
+#[derive(Clone, Debug)]
+pub struct MonolithCauchy31Params<F: MonolithField32> {
+    pub(crate) t: usize,
+    pub(crate) rounds: usize,
+    pub(crate) round_constants: Vec<Vec<F>>,
+    pub(crate) mds: Vec<Vec<F>>,
+    pub(crate) lookup1: Vec<u16>,
+    pub(crate) lookup2: Vec<u16>,
+}
+
+impl<F: MonolithField64> MonolithCauchy64Params<F> {
+    pub const R: usize = 6;
+    pub const BARS: usize = 4;
+
+    pub fn new(t: usize, mds: Vec<Vec<F>>) -> Self {
+        assert!(t == 8 || t == 12);
+        let modulus = F::modulus_u64();
+        let round_constants = instantiate_rc_64::<F>(t, modulus);
+        let lookup = instantiate_lookup();
+
+        MonolithCauchy64Params {
+            t,
+            rounds: Self::R,
+            round_constants,
+            mds,
+            lookup,
+        }
+    }
+}
+
+impl<F: MonolithField32> MonolithCauchy31Params<F> {
+    pub const R: usize = 6;
+    pub const BARS: usize = 8;
+
+    pub fn new(t: usize, mds: Vec<Vec<F>>) -> Self {
+        assert!(t == 16 || t == 24);
+        let modulus = F::modulus_u32();
+        let round_constants = instantiate_rc_32::<F>(t, modulus);
+        let lookup1 = instantiate_lookup();
+        let lookup2 = instantiate_lookup2();
+
+        MonolithCauchy31Params {
+            t,
+            rounds: Self::R,
+            round_constants,
+            mds,
+            lookup1,
+            lookup2,
+        }
+    }
+}
+
+// -- Original circulant MDS matrix helpers (kept for reference) --
+
 fn mds_64<F: FieldElement>(t: usize) -> Vec<Vec<F>> {
     match t {
         8 => circulant_from_row::<F>(&[23, 8, 13, 10, 7, 6, 21, 8], t),

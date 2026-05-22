@@ -1,0 +1,62 @@
+Hi all, I will summarize the situation regarding the plain implementations:
+
+Fields: The implementations for bn254 and bls12-381 are imported from Arkworks. The implementations for Goldilocks, Koalabear, Babybear, and Mersenne31 are imported from Plonky2/3 (I feel this part of the implementation in Plonky2/3 is highly optimized). I removed felt252 because I feel this field is rarely used. Most of the original implementation code was adapted from public repositories. I replaced the underlying field calls with ours (as described above) to ensure a fair comparison. The security parameter is set to 128 bits. I feel that different hashes have different focuses; for instance, Monolith focuses on small fields around 32-bit, while Tip5, Tip4, and Tip4' focus on Goldilocks. Therefore, some hashes should arguably only be compared on specific fields and state widths.
+
+State width: Denoted by "t". I only considered state widths corresponding to approximately 512 bits and 768 bits.
+
+zkfriendlyhashzoo: https://extgit.isec.tugraz.at/krypto/zkfriendlyhashzoo/-/tree/master
+The following are the current implementation:
+Anemoi: Implemented for bn254 & bls12-381: t=2; Goldilocks: t=8, 12; Koalabear, Babybear, Mersenne31: t=16, 24.
+Basically adapted the Anemoi over binary field implementation to prime field (changed s-box and rounds).
+
+Poseidon: bn254 & bls12-381: t=2, 3; Goldilocks: t=8, 12; Koalabear, Babybear, Mersenne31: t=16, 24.
+Copied from zkfriendlyhashzoo and used constants generator scripts (https://extgit.iaik.tugraz.at/krypto/hadeshash) to generate the parameters.
+
+Poseidon2: bn254 & bls12-381: t=2, 3; Goldilocks: t=8, 12; Koalabear, Babybear, Mersenne31: t=16, 24.
+Copied from zkfriendlyhashzoo and used constants generator scripts (https://extgit.iaik.tugraz.at/krypto/hadeshash) to generate the parameters.
+
+GmimcERF (alpha=2, 3): bn254 & bls12-381: t=2, 3; Goldilocks: t=8, 12; Koalabear, Babybear, Mersenne31: t=16, 24.
+Copied from zkfriendlyhashzoo and used constants generator scripts (https://github.com/TaceoLabs/noir-GMiMC) to generate the parameters.
+
+Griffin: bn254 & bls12-381: t=3; Goldilocks: t=8, 12. (It seems the original paper requires the bit length of p > 63, and there is no definition for t=2).
+Copied from zkfriendlyhashzoo.
+
+Monolith: Goldilocks: t=8, 12; Koalabear, Babybear, Mersenne31: t=16, 24.
+Copied from zkfriendlyhashzoo.
+
+Neptune: bn254 & bls12-381: t=2; Goldilocks: t=8, 12; Koalabear, Babybear, Mersenne31: t=16, 24(t should be even).
+Copied from zkfriendlyhashzoo and parameters from https://tosc.iacr.org/index.php/ToSC/article/view/9849/9349
+
+For the rest of the hashes, I imported the existing configurations into our repo. For others, I didn't find public implementations (but I think not all hashes need to be benched on all fields).
+
+Polocolo: bn254 & bls12-381: t=3.
+Copied from https://github.com/KAIST-CryptLab/Polocolo/tree/main
+
+Reinforced concrete: bn254 & bls12-381: t=3.
+Copied from zkfriendlyhashzoo.
+
+Rescue Prime: bn254: t=3, bls12-381: t=2, 3, Goldilocks:t=8,12
+Copied from zkfriendlyhashzoo.
+
+Skyscraper: bn254 & bls12-381: t=2, 3.
+Copied from zkfriendlyhashzoo.
+
+Tip5: Goldilocks: t=16.
+(I didn't import Tip4 as it seems too similar to Tip5 from a permutation perspective).
+
+Tip4': Goldilocks: t=12.
+Copied from https://github.com/Neptune-Crypto/twenty-first, https://github.com/IAIK/ca-tip5family-monolith
+
+Arion: I only found a Sage implementation in https://github.com/sca-research/Arion, I didn't find Rust implementations.
+
+keccak256 & sha256 have been added to the bench.
+
+Remaining issues:
+1. For hashes that deploy matrices that only require the MDS property , such as Anemoi, Poseidon, and Neptune, the matrix multiplication calculation can exploit the matrix structure (e.g., using a circulant matrix allows for NTT optimizations or viewing it as a convolution to exploit efficient convolution algorithms). The current implementation simply selects a Cauchy matrix and uses an O(t^2) algorithm(except monolith). Regarding this part, there are two points of concern. First, some public implementations use O(n log n) algorithms (e.g., Monolith). Should we unify these matrices (e.g., ensure different hashes use the same matrix and multiplication method)? This seems like the fairest approach. Second, for small t, the trivial algorithm seems better. The O(n log n) algorithm might only become superior when the state width is larger (I am unsure where the critical threshold lies).
+2. Other configurations that need to be added, especially for the last 7 hashes
+3. Currently, there is still no implementation over binary fields (even characteristic can use the bench from Poseidon(b), but odd characteristic hasn't been organized yet). Also there is no Arion implementation.
+4. In the current benchmark, Keccak-256 and SHA-256 are measured as full hash functions, not as single permutations like the other benchmarks. So comparing them under the same “per-permutation” metric is not very appropriate. I guess we should instead estimate an equivalent number of permutations based on the input data size.
+
+Current code repo: https://github.com/CandF1010/SoK-ZK-Friendly-Hash-Functions
+
+This implementation phase took longer than I estimated as I had to investigate many papers. I won't have time to complete the remaining implementations as I need to focus on my graduation thesis. Below are the efficiency comparison results tested on my computer; please take a look to see if there are any data anomalies :)

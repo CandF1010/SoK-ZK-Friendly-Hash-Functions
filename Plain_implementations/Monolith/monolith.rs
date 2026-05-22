@@ -1,5 +1,14 @@
-use super::monolith_params::{Monolith31Params, Monolith64Params, MonolithField32, MonolithField64};
+use super::monolith_params::{Monolith31Params, Monolith64Params, MonolithCauchy64Params, MonolithCauchy31Params, MonolithField32, MonolithField64};
 use std::sync::Arc;
+
+// ============================================================
+// Original Monolith (circulant MDS).  Kept for reference.
+// In zkfriendlyhashzoo, the Monolith-64 MDS multiplication
+// uses an FFT-based O(n log n) algorithm exploiting the
+// circulant structure (see mds_8.rs / mds_12.rs upstream).
+// Our simplified version uses generic O(t²) multiplication
+// with a precomputed circulant matrix.
+// ============================================================
 
 #[derive(Clone, Debug)]
 pub struct Monolith64<F: MonolithField64> {
@@ -140,6 +149,170 @@ impl<F: MonolithField32> Monolith31<F> {
 
     fn bars(&self, state: &mut [F]) {
         for el in state.iter_mut().take(Monolith31Params::<F>::BARS) {
+            let mut value = el.to_u32();
+            value = self.bar_u32_lookup(value);
+            *el = F::from_u64(value as u64);
+        }
+    }
+
+    fn bar_u32_lookup(&self, value: u32) -> u32 {
+        let low = self.params.lookup1[(value & 0xffff) as usize] as u32;
+        let high = self.params.lookup2[(value >> 16) as usize] as u32;
+        low | (high << 16)
+    }
+}
+
+// ============================================================
+// Cauchy-MDS Monolith variants for fair benchmark comparison.
+//
+// These use a Cauchy MDS matrix with generic O(t²)
+// multiplication instead of the circulant matrix used in the
+// original zkfriendlyhashzoo implementation.  All other
+// algorithmic details (bars, bricks, rounds) are identical.
+//
+// Only these Cauchy variants are benchmarked to ensure a fair
+// comparison with other hash functions that also use Cauchy MDS.
+// ============================================================
+
+#[derive(Clone, Debug)]
+pub struct MonolithCauchy64<F: MonolithField64> {
+    pub(crate) params: Arc<MonolithCauchy64Params<F>>,
+}
+
+#[derive(Clone, Debug)]
+pub struct MonolithCauchy31<F: MonolithField32> {
+    pub(crate) params: Arc<MonolithCauchy31Params<F>>,
+}
+
+impl<F: MonolithField64> MonolithCauchy64<F> {
+    pub fn new(params: &Arc<MonolithCauchy64Params<F>>) -> Self {
+        MonolithCauchy64 {
+            params: Arc::clone(params),
+        }
+    }
+
+    pub fn get_t(&self) -> usize {
+        self.params.t
+    }
+
+    pub fn permutation(&self, input: &[F]) -> Vec<F> {
+        let t = self.params.t;
+        assert_eq!(input.len(), t);
+
+        let mut state = input.to_vec();
+        self.concrete(&mut state, None);
+
+        for rc in self.params.round_constants.iter() {
+            self.bars(&mut state);
+            self.bricks(&mut state);
+            self.concrete(&mut state, Some(rc));
+        }
+
+        self.bars(&mut state);
+        self.bricks(&mut state);
+        self.concrete(&mut state, None);
+        state
+    }
+
+    fn concrete(&self, state: &mut [F], rc: Option<&[F]>) {
+        let t = self.params.t;
+        let mut out = vec![F::zero(); t];
+        for row in 0..t {
+            if let Some(rc) = rc {
+                out[row].add_assign(&rc[row]);
+            }
+            for col in 0..t {
+                let mut tmp = self.params.mds[row][col].clone();
+                tmp.mul_assign(&state[col]);
+                out[row].add_assign(&tmp);
+            }
+        }
+        state.clone_from_slice(&out);
+    }
+
+    fn bricks(&self, state: &mut [F]) {
+        let prev = state.to_vec();
+        for i in 1..state.len() {
+            let mut sq = prev[i - 1].clone();
+            sq.square();
+            state[i].add_assign(&sq);
+        }
+    }
+
+    fn bars(&self, state: &mut [F]) {
+        for el in state.iter_mut().take(MonolithCauchy64Params::<F>::BARS) {
+            let mut value = el.to_u64();
+            value = self.bar_u64_lookup(value);
+            *el = F::from_u64(value);
+        }
+    }
+
+    fn bar_u64_lookup(&self, value: u64) -> u64 {
+        let l1 = self.params.lookup[(value & 0xffff) as usize] as u64;
+        let l2 = self.params.lookup[((value >> 16) & 0xffff) as usize] as u64;
+        let l3 = self.params.lookup[((value >> 32) & 0xffff) as usize] as u64;
+        let l4 = self.params.lookup[((value >> 48) & 0xffff) as usize] as u64;
+        l1 | (l2 << 16) | (l3 << 32) | (l4 << 48)
+    }
+}
+
+impl<F: MonolithField32> MonolithCauchy31<F> {
+    pub fn new(params: &Arc<MonolithCauchy31Params<F>>) -> Self {
+        MonolithCauchy31 {
+            params: Arc::clone(params),
+        }
+    }
+
+    pub fn get_t(&self) -> usize {
+        self.params.t
+    }
+
+    pub fn permutation(&self, input: &[F]) -> Vec<F> {
+        let t = self.params.t;
+        assert_eq!(input.len(), t);
+
+        let mut state = input.to_vec();
+        self.concrete(&mut state, None);
+
+        for rc in self.params.round_constants.iter() {
+            self.bars(&mut state);
+            self.bricks(&mut state);
+            self.concrete(&mut state, Some(rc));
+        }
+
+        self.bars(&mut state);
+        self.bricks(&mut state);
+        self.concrete(&mut state, None);
+        state
+    }
+
+    fn concrete(&self, state: &mut [F], rc: Option<&[F]>) {
+        let t = self.params.t;
+        let mut out = vec![F::zero(); t];
+        for row in 0..t {
+            if let Some(rc) = rc {
+                out[row].add_assign(&rc[row]);
+            }
+            for col in 0..t {
+                let mut tmp = self.params.mds[row][col].clone();
+                tmp.mul_assign(&state[col]);
+                out[row].add_assign(&tmp);
+            }
+        }
+        state.clone_from_slice(&out);
+    }
+
+    fn bricks(&self, state: &mut [F]) {
+        let prev = state.to_vec();
+        for i in 1..state.len() {
+            let mut sq = prev[i - 1].clone();
+            sq.square();
+            state[i].add_assign(&sq);
+        }
+    }
+
+    fn bars(&self, state: &mut [F]) {
+        for el in state.iter_mut().take(MonolithCauchy31Params::<F>::BARS) {
             let mut value = el.to_u32();
             value = self.bar_u32_lookup(value);
             *el = F::from_u64(value as u64);

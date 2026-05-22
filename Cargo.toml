@@ -19,5 +19,7 @@ p3-goldilocks = { path = "../Plonky3/goldilocks" }
 p3-koala-bear = { path = "../Plonky3/koala-bear" }
 p3-mersenne-31 = { path = "../Plonky3/mersenne-31" }
 sha3 = "0.10"
-sha2 = "0.10"
-zkhash = { path = "../Downloads/zkfriendlyhashzoo-master/plain_impls" }
+sha2 = { version = "0.10", features = ["compress"] }
+keccak = "0.1"
+blake3 = "1"
+blake2 = "0.10.6"

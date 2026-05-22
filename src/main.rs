@@ -1,3 +1,17 @@
+use sok_zk_friendly_hash_functions::arion::arion::Arion;
+use sok_zk_friendly_hash_functions::arion::instances::{
+    ARION_BLS12_381_3_PARAMS,
+    ARION_BN254_3_PARAMS, ARION_GOLDILOCKS_12_PARAMS, ARION_GOLDILOCKS_8_PARAMS,
+};
+use sok_zk_friendly_hash_functions::xhash::instances::{
+    XHASH_BABYBEAR_16_PARAMS, XHASH_BABYBEAR_24_PARAMS, XHASH_BLS12_381_2_PARAMS,
+    XHASH_BLS12_381_3_PARAMS, XHASH_BN254_2_PARAMS, XHASH_BN254_3_PARAMS,
+    XHASH_GOLDILOCKS_12_PARAMS, XHASH_GOLDILOCKS_8_PARAMS, XHASH_KOALABEAR_16_PARAMS,
+    XHASH_KOALABEAR_24_PARAMS, XHASH_MERSENNE31_16_PARAMS, XHASH_MERSENNE31_24_PARAMS,
+};
+use sok_zk_friendly_hash_functions::xhash::xhash::XHash;
+// Vision-mark32 removed from benchmark: designed for binary tower fields,
+// not suitable for prime-field comparison (S-box inversion only fast on F_2^32).
 use sok_zk_friendly_hash_functions::anemoi::anemoi::Anemoi;
 use sok_zk_friendly_hash_functions::anemoi::instances::{
     ANEMOI_BABYBEAR_16_PARAMS, ANEMOI_BABYBEAR_24_PARAMS, ANEMOI_BLS12_381_2_PARAMS,
@@ -27,12 +41,12 @@ use sok_zk_friendly_hash_functions::gmimc_erf::instances::{
     GMIMC_ERF_MERSENNE31_16_PARAMS, GMIMC_ERF_MERSENNE31_24_PARAMS,
 };
 use sok_zk_friendly_hash_functions::monolith::instances::{
-    MONOLITH_BABYBEAR_16_PARAMS, MONOLITH_BABYBEAR_24_PARAMS,
-    MONOLITH_GOLDILOCKS_12_PARAMS, MONOLITH_GOLDILOCKS_8_PARAMS,
-    MONOLITH_KOALABEAR_16_PARAMS, MONOLITH_KOALABEAR_24_PARAMS,
-    MONOLITH_MERSENNE31_16_PARAMS, MONOLITH_MERSENNE31_24_PARAMS,
+    MONOLITH_CAUCHY_BABYBEAR_16_PARAMS, MONOLITH_CAUCHY_BABYBEAR_24_PARAMS,
+    MONOLITH_CAUCHY_GOLDILOCKS_12_PARAMS, MONOLITH_CAUCHY_GOLDILOCKS_8_PARAMS,
+    MONOLITH_CAUCHY_KOALABEAR_16_PARAMS, MONOLITH_CAUCHY_KOALABEAR_24_PARAMS,
+    MONOLITH_CAUCHY_MERSENNE31_16_PARAMS, MONOLITH_CAUCHY_MERSENNE31_24_PARAMS,
 };
-use sok_zk_friendly_hash_functions::monolith::monolith::{Monolith31, Monolith64};
+use sok_zk_friendly_hash_functions::monolith::monolith::{MonolithCauchy31, MonolithCauchy64};
 use sok_zk_friendly_hash_functions::monolith::monolith_params::{MonolithField32, MonolithField64};
 use sok_zk_friendly_hash_functions::neptune::neptune::Neptune;
 use sok_zk_friendly_hash_functions::neptune::instances::{
@@ -82,8 +96,7 @@ use sok_zk_friendly_hash_functions::tip4::tip4::Tip4Field;
 use sok_zk_friendly_hash_functions::tip5::tip5::Tip5;
 use sok_zk_friendly_hash_functions::tip5::instances::TIP5_GOLDILOCKS_PARAMS;
 use sok_zk_friendly_hash_functions::tip5::tip5::Tip5Field;
-use sha2::{Digest, Sha256};
-use sha3::Keccak256;
+use sok_zk_friendly_hash_functions::plain_hashes;
 use std::hint::black_box;
 use std::time::Instant;
 
@@ -543,47 +556,47 @@ fn main() {
         ITERS,
     );
 
-    println!("\n== Monolith (state ~512) ==");
-    bench_monolith64(
+    println!("\n== Monolith-Cauchy (state ~512) ==");
+    bench_monolith_cauchy64(
         "Monolith Goldilocks t=8",
-        &Monolith64::new(&MONOLITH_GOLDILOCKS_8_PARAMS),
+        &MonolithCauchy64::new(&MONOLITH_CAUCHY_GOLDILOCKS_8_PARAMS),
         ITERS,
     );
-    bench_monolith31(
+    bench_monolith_cauchy31(
         "Monolith Mersenne31 t=16",
-        &Monolith31::new(&MONOLITH_MERSENNE31_16_PARAMS),
+        &MonolithCauchy31::new(&MONOLITH_CAUCHY_MERSENNE31_16_PARAMS),
         ITERS,
     );
-    bench_monolith31(
+    bench_monolith_cauchy31(
         "Monolith BabyBear t=16",
-        &Monolith31::new(&MONOLITH_BABYBEAR_16_PARAMS),
+        &MonolithCauchy31::new(&MONOLITH_CAUCHY_BABYBEAR_16_PARAMS),
         ITERS,
     );
-    bench_monolith31(
+    bench_monolith_cauchy31(
         "Monolith KoalaBear t=16",
-        &Monolith31::new(&MONOLITH_KOALABEAR_16_PARAMS),
+        &MonolithCauchy31::new(&MONOLITH_CAUCHY_KOALABEAR_16_PARAMS),
         ITERS,
     );
 
-    println!("\n== Monolith (state ~768) ==");
-    bench_monolith64(
+    println!("\n== Monolith-Cauchy (state ~768) ==");
+    bench_monolith_cauchy64(
         "Monolith Goldilocks t=12",
-        &Monolith64::new(&MONOLITH_GOLDILOCKS_12_PARAMS),
+        &MonolithCauchy64::new(&MONOLITH_CAUCHY_GOLDILOCKS_12_PARAMS),
         ITERS,
     );
-    bench_monolith31(
+    bench_monolith_cauchy31(
         "Monolith Mersenne31 t=24",
-        &Monolith31::new(&MONOLITH_MERSENNE31_24_PARAMS),
+        &MonolithCauchy31::new(&MONOLITH_CAUCHY_MERSENNE31_24_PARAMS),
         ITERS,
     );
-    bench_monolith31(
+    bench_monolith_cauchy31(
         "Monolith BabyBear t=24",
-        &Monolith31::new(&MONOLITH_BABYBEAR_24_PARAMS),
+        &MonolithCauchy31::new(&MONOLITH_CAUCHY_BABYBEAR_24_PARAMS),
         ITERS,
     );
-    bench_monolith31(
+    bench_monolith_cauchy31(
         "Monolith KoalaBear t=24",
-        &Monolith31::new(&MONOLITH_KOALABEAR_24_PARAMS),
+        &MonolithCauchy31::new(&MONOLITH_CAUCHY_KOALABEAR_24_PARAMS),
         ITERS,
     );
 
@@ -601,11 +614,95 @@ fn main() {
         ITERS,
     );
 
-    println!("\n== SHA2/Keccak (bytes, baseline) ==");
-    bench_sha256("SHA-256 input=64B", ITERS, 64);
-    bench_keccak256("Keccak-256 input=64B", ITERS, 64);
-    bench_sha256("SHA-256 input=96B", ITERS, 96);
-    bench_keccak256("Keccak-256 input=96B", ITERS, 96);
+    println!("\n== Arion (~256-bit fields) ==");
+    bench_arion("Arion BN254 t=3", &Arion::new(&ARION_BN254_3_PARAMS), ITERS);
+    bench_arion(
+        "Arion BLS12-381 t=3",
+        &Arion::new(&ARION_BLS12_381_3_PARAMS),
+        ITERS,
+    );
+
+    println!("\n== Arion (~64-bit field) ==");
+    bench_arion(
+        "Arion Goldilocks t=8",
+        &Arion::new(&ARION_GOLDILOCKS_8_PARAMS),
+        ITERS,
+    );
+    bench_arion(
+        "Arion Goldilocks t=12",
+        &Arion::new(&ARION_GOLDILOCKS_12_PARAMS),
+        ITERS,
+    );
+
+    // Arion is designed for large prime fields (≥256-bit).
+    // 31-bit fields are not its design target — excluded from benchmark.
+
+    println!("\n== XHash (~256-bit fields) ==");
+    bench_xhash("XHash BN254 t=2", &XHash::new(&XHASH_BN254_2_PARAMS), ITERS);
+    bench_xhash("XHash BN254 t=3", &XHash::new(&XHASH_BN254_3_PARAMS), ITERS);
+    bench_xhash(
+        "XHash BLS12-381 t=2",
+        &XHash::new(&XHASH_BLS12_381_2_PARAMS),
+        ITERS,
+    );
+    bench_xhash(
+        "XHash BLS12-381 t=3",
+        &XHash::new(&XHASH_BLS12_381_3_PARAMS),
+        ITERS,
+    );
+
+    println!("\n== XHash (~64-bit field) ==");
+    bench_xhash(
+        "XHash Goldilocks t=8",
+        &XHash::new(&XHASH_GOLDILOCKS_8_PARAMS),
+        ITERS,
+    );
+    bench_xhash(
+        "XHash Goldilocks t=12",
+        &XHash::new(&XHASH_GOLDILOCKS_12_PARAMS),
+        ITERS,
+    );
+
+    println!("\n== XHash (~31-bit fields) ==");
+    bench_xhash(
+        "XHash Mersenne31 t=16",
+        &XHash::new(&XHASH_MERSENNE31_16_PARAMS),
+        ITERS,
+    );
+    bench_xhash(
+        "XHash Mersenne31 t=24",
+        &XHash::new(&XHASH_MERSENNE31_24_PARAMS),
+        ITERS,
+    );
+    bench_xhash(
+        "XHash BabyBear t=16",
+        &XHash::new(&XHASH_BABYBEAR_16_PARAMS),
+        ITERS,
+    );
+    bench_xhash(
+        "XHash BabyBear t=24",
+        &XHash::new(&XHASH_BABYBEAR_24_PARAMS),
+        ITERS,
+    );
+    bench_xhash(
+        "XHash KoalaBear t=16",
+        &XHash::new(&XHASH_KOALABEAR_16_PARAMS),
+        ITERS,
+    );
+    bench_xhash(
+        "XHash KoalaBear t=24",
+        &XHash::new(&XHASH_KOALABEAR_24_PARAMS),
+        ITERS,
+    );
+
+    // Vision-mark32 removed: designed for binary tower fields (F_2^32),
+    // S-box inversion only fast on binary fields, not on prime fields.
+
+    println!("\n== SHA-256 / Keccak-f / Blake2b / Blake3 (permutations) ==");
+    bench_sha256_perm("SHA-256 compress (1 block)", ITERS);
+    bench_keccak_f1600("Keccak-f[1600] (24 rounds)", ITERS);
+    bench_blake2b_perm("Blake2b compress (1 block)", ITERS);
+    bench_blake3_perm("Blake3 compress (1 block)", ITERS);
 }
 
 fn bench_poseidon<F: FieldElement>(label: &str, perm: &Poseidon<F>, iters: usize) {
@@ -657,12 +754,12 @@ fn bench_reinforced_concrete<F: PrimeFieldWords>(
     bench_with_input(label, iters, &input, |inp| perm.permutation(inp));
 }
 
-fn bench_monolith64<F: MonolithField64>(label: &str, perm: &Monolith64<F>, iters: usize) {
+fn bench_monolith_cauchy64<F: MonolithField64>(label: &str, perm: &MonolithCauchy64<F>, iters: usize) {
     let input = make_input::<F>(perm.get_t());
     bench_with_input(label, iters, &input, |inp| perm.permutation(inp));
 }
 
-fn bench_monolith31<F: MonolithField32>(label: &str, perm: &Monolith31<F>, iters: usize) {
+fn bench_monolith_cauchy31<F: MonolithField32>(label: &str, perm: &MonolithCauchy31<F>, iters: usize) {
     let input = make_input::<F>(perm.get_t());
     bench_with_input(label, iters, &input, |inp| perm.permutation(inp));
 }
@@ -682,22 +779,94 @@ fn bench_rescue<F: FieldElement>(label: &str, perm: &RescuePrime<F>, iters: usiz
     bench_with_input(label, iters, &input, |inp| perm.permutation(inp));
 }
 
-fn bench_sha256(label: &str, iters: usize, input_len: usize) {
-    let input = make_bytes_input(input_len);
-    bench_with_bytes(label, iters, &input, |inp| Sha256::digest(inp));
+fn bench_arion<F: FieldElement>(label: &str, perm: &Arion<F>, iters: usize) {
+    let input = make_input::<F>(perm.get_t());
+    bench_with_input(label, iters, &input, |inp| perm.permutation(inp));
 }
 
-fn bench_keccak256(label: &str, iters: usize, input_len: usize) {
-    let input = make_bytes_input(input_len);
-    bench_with_bytes(label, iters, &input, |inp| Keccak256::digest(inp));
+fn bench_xhash<F: FieldElement>(label: &str, perm: &XHash<F>, iters: usize) {
+    let input = make_input::<F>(perm.get_t());
+    bench_with_input(label, iters, &input, |inp| perm.permutation(inp));
+}
+
+fn bench_sha256_perm(label: &str, iters: usize) {
+    // SHA-256 IV (NIST FIPS 180-4 §5.3.3)
+    // sha2 crate compress256 takes &[GenericArray<u8, U64>]
+    let mut state: [u32; 8] = [
+        0x6a09e667, 0xbb67ae85, 0x3c6ef372, 0xa54ff53a,
+        0x510e527f, 0x9b05688c, 0x1f83d9ab, 0x5be0cd19,
+    ];
+    use sha2::digest::generic_array::GenericArray;
+    let block_arr: [u8; 64] = core::array::from_fn(|i| (i as u8).wrapping_add(1));
+    let block: GenericArray<u8, sha2::digest::typenum::U64> = GenericArray::clone_from_slice(&block_arr);
+
+    let start = Instant::now();
+    for _ in 0..iters {
+        plain_hashes::sha256_compress(&mut state, core::slice::from_ref(&block));
+        black_box(&state);
+    }
+    let elapsed = start.elapsed();
+    let per_ns = elapsed.as_nanos() / iters as u128;
+    println!("{label}: {iters} iters in {elapsed:?} ({per_ns} ns/iter)");
+    black_box(state);
+}
+
+fn bench_keccak_f1600(label: &str, iters: usize) {
+    // keccak crate → f1600(&mut [u64; 25])
+    let mut state: [u64; 25] = core::array::from_fn(|i| i as u64);
+
+    let start = Instant::now();
+    for _ in 0..iters {
+        plain_hashes::keccak_f1600(&mut state);
+        black_box(&state);
+    }
+    let elapsed = start.elapsed();
+    let per_ns = elapsed.as_nanos() / iters as u128;
+    println!("{label}: {iters} iters in {elapsed:?} ({per_ns} ns/iter)");
+    black_box(state);
+}
+
+fn bench_blake2b_perm(label: &str, iters: usize) {
+    // Adapted from blake2 crate (RustCrypto) macros.rs
+    let mut h: [u64; 8] = [
+        0x6a09e667f3bcc908, 0xbb67ae8584caa73b,
+        0x3c6ef372fe94f82b, 0xa54ff53a5f1d36f1,
+        0x510e527fade682d1, 0x9b05688c2b3e6c1f,
+        0x1f83d9abfb41bd6b, 0x5be0cd19137e2179,
+    ];
+    let m: [u64; 16] = core::array::from_fn(|i| i as u64);
+
+    let start = Instant::now();
+    for _ in 0..iters {
+        plain_hashes::blake2b_compress(&mut h, &m, 0, 0, 0, 0);
+        black_box(&h);
+    }
+    let elapsed = start.elapsed();
+    let per_ns = elapsed.as_nanos() / iters as u128;
+    println!("{label}: {iters} iters in {elapsed:?} ({per_ns} ns/iter)");
+    black_box(h);
+}
+
+fn bench_blake3_perm(label: &str, iters: usize) {
+    // Adapted from blake3 crate (BLAKE3-team) portable.rs
+    let cv: [u32; 8] = [
+        0x6a09e667, 0xbb67ae85, 0x3c6ef372, 0xa54ff53a,
+        0x510e527f, 0x9b05688c, 0x1f83d9ab, 0x5be0cd19,
+    ];
+    let block: [u8; 64] = core::array::from_fn(|i| i as u8);
+
+    let start = Instant::now();
+    for _ in 0..iters {
+        let out = plain_hashes::blake3_compress(&cv, &block, 64, 0, 0);
+        black_box(&out);
+    }
+    let elapsed = start.elapsed();
+    let per_ns = elapsed.as_nanos() / iters as u128;
+    println!("{label}: {iters} iters in {elapsed:?} ({per_ns} ns/iter)");
 }
 
 fn make_input<F: FieldElement>(t: usize) -> Vec<F> {
     (0..t).map(|i| F::from_u64((i + 1) as u64)).collect()
-}
-
-fn make_bytes_input(len: usize) -> Vec<u8> {
-    (0..len).map(|i| (i as u8).wrapping_add(1)).collect()
 }
 
 fn bench_with_input<F: FieldElement, R, FFn: FnMut(&[F]) -> R>(
@@ -718,20 +887,4 @@ fn bench_with_input<F: FieldElement, R, FFn: FnMut(&[F]) -> R>(
     black_box(out);
 }
 
-fn bench_with_bytes<R, FFn: FnMut(&[u8]) -> R>(
-    label: &str,
-    iters: usize,
-    input: &[u8],
-    mut f: FFn,
-) {
-    let start = Instant::now();
-    let mut out = None;
-    for _ in 0..iters {
-        out = Some(f(input));
-        black_box(&out);
-    }
-    let elapsed = start.elapsed();
-    let per_ns = elapsed.as_nanos() / iters as u128;
-    println!("{label}: {iters} iters in {elapsed:?} ({per_ns} ns/iter)");
-    black_box(out);
-}
+

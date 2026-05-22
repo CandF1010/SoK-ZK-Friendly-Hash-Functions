@@ -1,4 +1,5 @@
 pub mod fields;
+pub mod plain_hashes;
 mod utils;
 #[path = "Poseidon2/mod.rs"]
 pub mod poseidon2;
@@ -26,3 +27,9 @@ pub mod monolith;
 pub mod skyscraper;
 #[path = "Polocolo/mod.rs"]
 pub mod polocolo;
+#[path = "Arion/mod.rs"]
+pub mod arion;
+#[path = "XHash/mod.rs"]
+pub mod xhash;
+#[path = "VisionMark32/mod.rs"]
+pub mod vision_mark32;
