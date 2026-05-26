@@ -64,16 +64,19 @@ lazy_static! {
             .chunks(STATE_SIZE)
             .map(|chunk| chunk.iter().map(|&v| Goldilocks::from_u64(v)).collect())
             .collect();
-        let mds = circulant_from_first_column::<Goldilocks>(&MDS_MATRIX_FIRST_COLUMN);
+        let mds_first_column: Vec<Goldilocks> = MDS_MATRIX_FIRST_COLUMN
+            .iter()
+            .map(|&v| Goldilocks::from_u64(v))
+            .collect();
         let (r, r_inv) = monty_constants();
-        Arc::new(Tip5Params {
-            t: STATE_SIZE,
-            rounds: NUM_ROUNDS,
+        Arc::new(Tip5Params::new(
+            STATE_SIZE,
+            NUM_ROUNDS,
             round_constants,
-            mds,
+            mds_first_column,
             r,
             r_inv,
-        })
+        ))
     };
 }
 
@@ -85,24 +88,4 @@ fn monty_constants() -> (Goldilocks, Goldilocks) {
     (r, r_inv)
 }
 
-fn circulant_from_first_column<F: FieldElement>(col: &[u64]) -> Vec<Vec<F>> {
-    let t = col.len();
-    let mut row = Vec::with_capacity(t);
-    row.push(F::from_u64(col[0]));
-    for i in (1..t).rev() {
-        row.push(F::from_u64(col[i]));
-    }
-    circulant_from_row(&row)
-}
 
-fn circulant_from_row<F: FieldElement>(row: &[F]) -> Vec<Vec<F>> {
-    let t = row.len();
-    let mut mat = Vec::with_capacity(t);
-    let mut rot = row.to_owned();
-    mat.push(rot.clone());
-    for _ in 1..t {
-        rot.rotate_right(1);
-        mat.push(rot.clone());
-    }
-    mat
-}

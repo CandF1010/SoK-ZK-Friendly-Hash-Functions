@@ -1,2 +1,2 @@
-pub mod xhash;
 pub mod instances;
+pub mod sgmimc;

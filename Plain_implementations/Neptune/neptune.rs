@@ -181,7 +181,73 @@ impl<F: FieldElement> Neptune<F> {
     }
 
     fn external_matmul(&self, state: &mut [F]) {
-        self.matmul_in_place(state, &self.params.m_e);
+        match self.params.t {
+            4 => {
+                let out = Self::external_matmul_4(state);
+                state.clone_from_slice(&out);
+            }
+            8 => {
+                let out = Self::external_matmul_8(state);
+                state.clone_from_slice(&out);
+            }
+            _ => {
+                self.matmul_in_place(state, &self.params.m_e);
+            }
+        }
+    }
+
+    /// Hand-optimized circulant expansion for t=4: circ(2, 1, 1, 1).
+    /// From zkfriendlyhashzoo: swap + sum + accumulate.
+    fn external_matmul_4(input: &[F]) -> Vec<F> {
+        let mut output = input.to_vec();
+        output.swap(1, 3);
+
+        let mut sum1 = input[0].clone();
+        sum1.add_assign(&input[2]);
+        let mut sum2 = input[1].clone();
+        sum2.add_assign(&input[3]);
+
+        output[0].add_assign(&sum1);
+        output[1].add_assign(&sum2);
+        output[2].add_assign(&sum1);
+        output[3].add_assign(&sum2);
+
+        output
+    }
+
+    /// Hand-optimized circulant expansion for t=8: circ(3, 2, 1, 1, ...).
+    /// Equals state + state + rot(state) + sum(state).
+    /// From zkfriendlyhashzoo: swap + sum + rotate + double.
+    fn external_matmul_8(input: &[F]) -> Vec<F> {
+        let mut output = input.to_vec();
+        output.swap(1, 7);
+        output.swap(3, 5);
+
+        let mut sum1 = input[0].clone();
+        let mut sum2 = input[1].clone();
+
+        for el in input.iter().step_by(2).skip(1) {
+            sum1.add_assign(el);
+        }
+        for el in input.iter().skip(1).step_by(2).skip(1) {
+            sum2.add_assign(el);
+        }
+
+        let mut output_rot = output.clone();
+        output_rot.rotate_left(2);
+
+        for (i, el) in output.iter_mut().enumerate() {
+            el.double();
+            el.add_assign(&output_rot[i]);
+            if i & 1 == 0 {
+                el.add_assign(&sum1);
+            } else {
+                el.add_assign(&sum2);
+            }
+        }
+
+        output.swap(3, 7);
+        output
     }
 
     fn internal_matmul(&self, state: &mut [F]) {

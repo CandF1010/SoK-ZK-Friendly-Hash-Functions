@@ -26,7 +26,7 @@ pub(crate) const LOOKUP_TABLE: [u8; 256] = [
     222, 82, 115, 70, 210, 27, 41, 1, 170, 40, 131, 192, 229, 248, 255,
 ];
 
-const TIP4P_MDS_ROW: [u64; 12] = [7, 23, 8, 26, 13, 10, 9, 7, 6, 22, 21, 8];
+const TIP4P_MDS_FIRST_COLUMN: [u64; 12] = [7, 8, 21, 22, 6, 7, 9, 10, 13, 26, 8, 23];
 
 const TIP4P_ARK: [[u64; 12]; NUM_ROUNDS] = [
     [
@@ -107,16 +107,19 @@ lazy_static! {
             .iter()
             .map(|row| row.iter().map(|&v| Goldilocks::from_u64(v)).collect())
             .collect();
-        let mds = circulant_from_row(&TIP4P_MDS_ROW);
+        let mds_first_column: Vec<Goldilocks> = TIP4P_MDS_FIRST_COLUMN
+            .iter()
+            .map(|&v| Goldilocks::from_u64(v))
+            .collect();
         let (r, r_inv) = monty_constants();
-        Arc::new(Tip4Params {
-            t: TIP4P_MDS_ROW.len(),
-            rounds: NUM_ROUNDS,
+        Arc::new(Tip4Params::new(
+            TIP4P_MDS_FIRST_COLUMN.len(),
+            NUM_ROUNDS,
             round_constants,
-            mds,
+            mds_first_column,
             r,
             r_inv,
-        })
+        ))
     };
 }
 
@@ -128,14 +131,4 @@ fn monty_constants() -> (Goldilocks, Goldilocks) {
     (r, r_inv)
 }
 
-fn circulant_from_row<F: FieldElement, const N: usize>(row: &[u64; N]) -> Vec<Vec<F>> {
-    let t = row.len();
-    let mut mat = Vec::with_capacity(t);
-    let mut rot: Vec<F> = row.iter().map(|&v| F::from_u64(v)).collect();
-    mat.push(rot.clone());
-    for _ in 1..t {
-        rot.rotate_right(1);
-        mat.push(rot.clone());
-    }
-    mat
-}
+

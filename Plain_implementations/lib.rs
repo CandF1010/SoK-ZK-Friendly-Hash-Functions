@@ -9,6 +9,8 @@ pub mod poseidon;
 pub mod anemoi;
 #[path = "GmimcErf/mod.rs"]
 pub mod gmimc_erf;
+#[path = "SgmiMc/mod.rs"]
+pub mod sgmimc;
 #[path = "Rescueprime/mod.rs"]
 pub mod rescueprime;
 #[path = "Griffin/mod.rs"]
@@ -29,7 +31,5 @@ pub mod skyscraper;
 pub mod polocolo;
 #[path = "Arion/mod.rs"]
 pub mod arion;
-#[path = "XHash/mod.rs"]
-pub mod xhash;
-#[path = "VisionMark32/mod.rs"]
-pub mod vision_mark32;
+// XHash removed: not in SoK benchmark scope.
+// VisionMark32 removed: binary-field design, not in SoK benchmark scope.

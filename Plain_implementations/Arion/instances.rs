@@ -2,10 +2,11 @@ use super::arion::ArionParams;
 use crate::fields::babybear::BabyBear;
 use crate::fields::bls12_381::Bls12_381;
 use crate::fields::bn254::Bn254;
-use crate::fields::goldilocks::Goldilocks;
+
 use crate::fields::koalabear::KoalaBear;
 use crate::fields::mersenne31::Mersenne31;
 use crate::fields::{FieldElement, PrimeField};
+use crate::utils::read_field_from_shake;
 use num_traits::Zero;
 use lazy_static::lazy_static;
 use sha3::digest::{ExtendableOutput, Update, XofReader};
@@ -38,7 +39,7 @@ fn generate_params<F: PrimeField>(t: usize, label: &str) -> Arc<ArionParams<F>> 
 
     // -- round constants: rounds × t elements --
     let round_constants: Vec<Vec<F>> = (0..rounds)
-        .map(|_| (0..t).map(|_| read_field(&mut reader, &modulus, byte_len)).collect())
+        .map(|_| (0..t).map(|_| read_field_from_shake(&mut reader)).collect())
         .collect();
 
     // -- g-coeffs: rounds × (t-1) pairs (alpha1, alpha2), enforce irreducibility --
@@ -49,8 +50,8 @@ fn generate_params<F: PrimeField>(t: usize, label: &str) -> Arc<ArionParams<F>> 
                     // Sample until discriminant is quadratic non-residue.
                     loop {
                         // Rejection sample within [0, p)
-                        let mut a1 = read_field(&mut reader, &modulus, byte_len);
-                        let a2 = read_field(&mut reader, &modulus, byte_len);
+                        let mut a1 = read_field_from_shake(&mut reader);
+                        let a2 = read_field_from_shake(&mut reader);
                         // Normalize to non-zero if zero.
                         if a1 == F::zero() {
                             a1 = F::one();
@@ -71,7 +72,7 @@ fn generate_params<F: PrimeField>(t: usize, label: &str) -> Arc<ArionParams<F>> 
 
     // -- h-coeffs: rounds × (t-1) elements (beta1) --
     let h_coeffs: Vec<Vec<F>> = (0..rounds)
-        .map(|_| (0..t - 1).map(|_| read_field(&mut reader, &modulus, byte_len)).collect())
+        .map(|_| (0..t - 1).map(|_| read_field_from_shake(&mut reader)).collect())
         .collect();
 
     Arc::new(ArionParams::new(t, d, d_inv, rounds, &g_coeffs, &h_coeffs, &round_constants))
@@ -147,38 +148,35 @@ fn modinv_biguint(value: &num_bigint::BigUint, modulus: &num_bigint::BigUint) ->
 
 /// Check if x^2 + a1*x + a2 is irreducible over F_p.
 /// True iff discriminant D = a1^2 - 4*a2 is a quadratic non-residue.
-fn is_irreducible<F: FieldElement>(
-    _a1: &F,
-    _a2: &F,
+fn is_irreducible<F: PrimeField>(
+    a1: &F,
+    a2: &F,
     _modulus: &num_bigint::BigUint,
-    _modulus_minus_one: &num_bigint::BigUint,
+    modulus_minus_one: &num_bigint::BigUint,
 ) -> bool {
-    // NOTE: Full Legendre-symbol irreducibility check is skipped for performance.
-    // SHAKE-sampled values are accepted directly. This does not affect benchmark
-    // results since all permutations use the same round structure.
-    true
-}
+    use num_bigint::BigUint;
+    // Discriminant D = a1^2 - 4*a2
+    let mut a1_sq = a1.clone();
+    a1_sq.square();
+    let mut four_a2 = a2.clone();
+    four_a2.mul_assign(&F::from_u64(4));
+    let mut d = a1_sq;
+    d.sub_assign(&four_a2);
 
-fn read_field<F: PrimeField>(
-    reader: &mut dyn XofReader,
-    modulus: &num_bigint::BigUint,
-    byte_len: usize,
-) -> F {
-    let bits = modulus.bits() as usize;
-    let mod_bits = bits % 8;
-    let mask = if mod_bits == 0 { 0xFF } else { (1u8 << mod_bits) - 1 };
-    let mut buf = vec![0u8; byte_len];
-    loop {
-        reader.read(&mut buf);
-        if mod_bits != 0 {
-            let last = buf.len() - 1;
-            buf[last] &= mask;
-        }
-        let val = num_bigint::BigUint::from_bytes_le(&buf);
-        if &val < modulus {
-            return F::from_biguint(&val);
-        }
+    // D == 0 => double root => reducible
+    if d == F::zero() {
+        return false;
     }
+
+    // Euler's criterion: Legendre(D) = D^{(p-1)/2} mod p.
+    // Irreducible iff Legendre(D) = -1 (quadratic non-residue),
+    // i.e. result == p - 1.
+    let half = modulus_minus_one / BigUint::from(2u64);
+    let half_limbs = half.to_u64_digits();
+    let d_legendre = d.pow_words_le(&half_limbs[..]);
+
+    let p_minus_one = F::from_biguint(modulus_minus_one);
+    d_legendre == p_minus_one
 }
 
 // ---------------------------------------------------------------------------
@@ -193,14 +191,6 @@ lazy_static! {
     // -- BLS12-381, t=3 --
     pub static ref ARION_BLS12_381_3_PARAMS: Arc<ArionParams<Bls12_381>> =
         generate_params::<Bls12_381>(3, "Arion-BLS12_381-3");
-
-    // -- Goldilocks, t=8 --
-    pub static ref ARION_GOLDILOCKS_8_PARAMS: Arc<ArionParams<Goldilocks>> =
-        generate_params::<Goldilocks>(8, "Arion-Goldilocks-8");
-
-    // -- Goldilocks, t=12 --
-    pub static ref ARION_GOLDILOCKS_12_PARAMS: Arc<ArionParams<Goldilocks>> =
-        generate_params::<Goldilocks>(12, "Arion-Goldilocks-12");
 
     // -- Mersenne31, t=16 --
     pub static ref ARION_MERSENNE31_16_PARAMS: Arc<ArionParams<Mersenne31>> =

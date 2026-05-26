@@ -18,9 +18,29 @@ pub struct Tip4Params<F: Tip4Field> {
     pub(crate) t: usize,
     pub(crate) rounds: usize,
     pub(crate) round_constants: Vec<Vec<F>>,
-    pub(crate) mds: Vec<Vec<F>>,
+    pub(crate) mds_first_column: Vec<F>,
     pub(crate) r: F,
     pub(crate) r_inv: F,
+}
+
+impl<F: Tip4Field> Tip4Params<F> {
+    pub fn new(
+        t: usize,
+        rounds: usize,
+        round_constants: Vec<Vec<F>>,
+        mds_first_column: Vec<F>,
+        r: F,
+        r_inv: F,
+    ) -> Self {
+        Tip4Params {
+            t,
+            rounds,
+            round_constants,
+            mds_first_column,
+            r,
+            r_inv,
+        }
+    }
 }
 
 #[derive(Clone, Debug)]
@@ -46,7 +66,7 @@ impl<F: Tip4Field> Tip4<F> {
         let mut state = input.to_vec();
         for round in 0..self.params.rounds {
             self.sbox_layer(&mut state);
-            state = self.matmul(&state, &self.params.mds);
+            state = self.mds_matmul(&state);
             self.add_round_constants(&mut state, round);
         }
         state
@@ -82,13 +102,18 @@ impl<F: Tip4Field> Tip4<F> {
         out
     }
 
-    fn matmul(&self, input: &[F], mat: &[Vec<F>]) -> Vec<F> {
-        let t = mat.len();
+    /// Circulant MDS multiplication using first-column indexing.
+    /// M[row][col] = mds_first_column[(row - col + t) % t].
+    /// Matches the original twenty-first circulant MDS implementation.
+    fn mds_matmul(&self, input: &[F]) -> Vec<F> {
+        let t = self.params.t;
         debug_assert_eq!(t, input.len());
+        let col = &self.params.mds_first_column;
         let mut out = vec![F::zero(); t];
         for row in 0..t {
-            for (col, inp) in input.iter().enumerate().take(t) {
-                let mut tmp = mat[row][col].clone();
+            for (col_idx, inp) in input.iter().enumerate() {
+                let idx = (t + row - col_idx) % t;
+                let mut tmp = col[idx].clone();
                 tmp.mul_assign(inp);
                 out[row].add_assign(&tmp);
             }

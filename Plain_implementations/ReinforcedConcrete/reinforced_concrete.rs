@@ -1,7 +1,7 @@
 use crate::fields::{biguint_to_limbs_le_4, PrimeFieldWords};
+use crate::utils::read_field_from_shake;
 use sha3::digest::{ExtendableOutput, Update, XofReader};
 use sha3::Shake128;
-use std::cmp::Ordering;
 use std::sync::Arc;
 
 #[derive(Clone, Debug)]
@@ -56,36 +56,10 @@ impl<F: PrimeFieldWords> ReinforcedConcreteParams<F> {
         (0..=Self::TOTAL_ROUNDS)
             .map(|_| {
                 (0..Self::T)
-                    .map(|_| Self::field_element_from_shake(shake))
+                    .map(|_| read_field_from_shake::<F>(shake))
                     .collect()
             })
             .collect()
-    }
-
-    // Sample a field element from XOF output using masked bytes and rejection sampling.
-    fn field_element_from_shake(reader: &mut dyn XofReader) -> F {
-        let modulus = F::modulus();
-        let bits = modulus.bits() as usize;
-        let bytes = bits.div_ceil(8);
-        let modulus_words = biguint_to_limbs_le_4(&modulus);
-        let mod_bits = bits % 8;
-        let mask = if mod_bits == 0 {
-            0xFFu8
-        } else {
-            (1u8 << mod_bits) - 1
-        };
-
-        let mut buf = vec![0u8; bytes];
-        let last = bytes - 1;
-
-        loop {
-            reader.read(&mut buf);
-            buf[last] &= mask;
-            let candidate_words = bytes_to_words_le_4(&buf);
-            if cmp_words_4(candidate_words, modulus_words) == Ordering::Less {
-                return F::from_words_le(candidate_words);
-            }
-        }
     }
 
     // Pad the lookup table with identity values so Bars indexing is always defined.
@@ -223,26 +197,6 @@ impl<F: PrimeFieldWords> ReinforcedConcrete<F> {
 
         F::from_words_le(n)
     }
-}
-
-fn bytes_to_words_le_4(bytes: &[u8]) -> [u64; 4] {
-    let mut out = [0u64; 4];
-    for (i, b) in bytes.iter().enumerate().take(32) {
-        out[i / 8] |= (*b as u64) << ((i % 8) * 8);
-    }
-    out
-}
-
-fn cmp_words_4(lhs: [u64; 4], rhs: [u64; 4]) -> Ordering {
-    for i in (0..4).rev() {
-        if lhs[i] < rhs[i] {
-            return Ordering::Less;
-        }
-        if lhs[i] > rhs[i] {
-            return Ordering::Greater;
-        }
-    }
-    Ordering::Equal
 }
 
 fn div_rem_words_u16(mut n: [u64; 4], base: u16) -> ([u64; 4], u16) {

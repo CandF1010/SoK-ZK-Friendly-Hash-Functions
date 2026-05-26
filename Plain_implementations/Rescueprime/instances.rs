@@ -3,8 +3,11 @@ use crate::fields::bls12_381::Bls12_381;
 use crate::fields::bn254::Bn254;
 use crate::fields::goldilocks::Goldilocks;
 use crate::fields::PrimeField;
+use crate::utils::{build_cauchy_mds, read_field_from_shake};
 use lazy_static::lazy_static;
 use num_bigint::BigUint;
+use sha3::digest::{ExtendableOutput, Update, XofReader};
+use sha3::Shake128;
 use std::sync::Arc;
 
 fn f_from_hex<F: PrimeField>(hex: &str) -> Option<F> {
@@ -191,10 +194,44 @@ lazy_static! {
             &MDS3,
             &RC3
         ));
+
+    // BN254 t=2: generated via SHAKE128 with domain-separated label.
+    pub static ref RESCUE_PRIME_BN254_2_PARAMS: Arc<RescuePrimeParams<Scalar>> = {
+        let t = 2usize;
+        let d = 5u64;
+        let rounds = 20usize;
+        // d_inv = 5^{-1} mod (p-1), same for all BN254 Rescue-Prime instances.
+        let d_inv: [u64; 4] = [
+            0xcfe7f7a98ccccccd,
+            0x535cb9d394945a0d,
+            0x93736af8679aad17,
+            0x26b6a528b427b354,
+        ];
+
+        let modulus = Scalar::modulus();
+        let byte_len = ((modulus.bits() + 7) / 8) as usize;
+
+        let mut shake = Shake128::default();
+        shake.update(b"Rescue-Prime-BN254-2");
+        let mut mod_bytes = modulus.to_bytes_le();
+        mod_bytes.resize(byte_len, 0);
+        shake.update(&mod_bytes);
+        let mut reader = shake.finalize_xof();
+
+        let mds = build_cauchy_mds::<Scalar>(t);
+
+        let round_constants: Vec<Vec<Scalar>> = (0..2 * rounds)
+            .map(|_| (0..t).map(|_| read_field_from_shake(&mut reader)).collect())
+            .collect();
+
+        Arc::new(RescuePrimeParams::new(
+            t, d, d_inv, rounds, &mds, &round_constants,
+        ))
+    };
 }
 }
 
-pub use bn254::RESCUE_PRIME_BN254_3_PARAMS;
+pub use bn254::{RESCUE_PRIME_BN254_2_PARAMS, RESCUE_PRIME_BN254_3_PARAMS};
 
 mod bls12_381 {
     use super::*;

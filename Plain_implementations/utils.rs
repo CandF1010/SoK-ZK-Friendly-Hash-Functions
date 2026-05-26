@@ -1,6 +1,7 @@
-use crate::fields::FieldElement;
+use crate::fields::{FieldElement, PrimeField};
 use num_bigint::{BigInt, BigUint};
 use num_traits::{One, Signed, Zero};
+use sha3::digest::XofReader;
 
 /// Build a Cauchy MDS matrix of size t×t.
 ///
@@ -67,4 +68,30 @@ pub(crate) fn pow_biguint<F: FieldElement>(base: &F, exp: &BigUint) -> F {
     }
 
     result
+}
+
+/// Sample a uniformly random field element from a SHAKE128 XOF stream.
+///
+/// Uses masked-byte rejection sampling: reads `ceil(modulus_bits/8)` bytes,
+/// masks the top bits of the last byte, and rejects values ≥ modulus.
+/// This is the standard method used by zkfriendlyhashzoo.
+pub fn read_field_from_shake<F: PrimeField>(reader: &mut dyn XofReader) -> F {
+    let modulus = F::modulus();
+    let bits = modulus.bits() as usize;
+    let byte_len = (bits + 7) / 8;
+    let mod_bits = bits % 8;
+    let mask = if mod_bits == 0 { 0xFFu8 } else { (1u8 << mod_bits) - 1 };
+    let last = byte_len.saturating_sub(1);
+    let mut buf = vec![0u8; byte_len];
+
+    loop {
+        reader.read(&mut buf);
+        if mod_bits != 0 {
+            buf[last] &= mask;
+        }
+        let val = BigUint::from_bytes_le(&buf);
+        if val < modulus {
+            return F::from_biguint(&val);
+        }
+    }
 }

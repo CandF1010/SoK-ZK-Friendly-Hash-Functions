@@ -1,6 +1,5 @@
-//! Plain permutation benchmarks for traditional hash functions.
+//! Plain permutation benchmarks for Cryptographic hash functions.
 //!
-//! To enable fair comparison with ZK-friendly hash permutations,
 //! we measure the cost of a single compression-function / permutation call
 //! rather than the full hash.  All code is adapted from well-known,
 //! well-tested RustCrypto / BLAKE3-team crate implementations.

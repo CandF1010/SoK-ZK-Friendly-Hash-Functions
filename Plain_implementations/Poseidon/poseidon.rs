@@ -58,9 +58,6 @@ impl<F: FieldElement> Poseidon<F> {
         let half_f = self.params.rounds_f_beginning;
         let mut round = 0usize;
 
-        // Match Poseidon2b-style flow: Minit + full/partial/full.
-        self.mul_mds_full(&mut state);
-
         for _ in 0..half_f {
             self.round_full(&mut state, round);
             round += 1;

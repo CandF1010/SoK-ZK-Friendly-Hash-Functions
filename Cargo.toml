@@ -13,11 +13,11 @@ ark-ff = "0.4"
 lazy_static = "1.4"
 num-bigint = "0.4"
 num-traits = "0.2"
-p3-baby-bear = { path = "../Plonky3/baby-bear" }
-p3-field = { path = "../Plonky3/field" }
-p3-goldilocks = { path = "../Plonky3/goldilocks" }
-p3-koala-bear = { path = "../Plonky3/koala-bear" }
-p3-mersenne-31 = { path = "../Plonky3/mersenne-31" }
+p3-baby-bear = "0.3"
+p3-field = "0.3"
+p3-goldilocks = "0.3"
+p3-koala-bear = "0.3"
+p3-mersenne-31 = "0.3"
 sha3 = "0.10"
 sha2 = { version = "0.10", features = ["compress"] }
 keccak = "0.1"
