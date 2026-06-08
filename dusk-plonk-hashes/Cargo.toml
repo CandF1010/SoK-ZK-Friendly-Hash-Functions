@@ -1,0 +1,66 @@
+[workspace]
+members = [
+    "dusk-plonk-anemoi",
+    "dusk-plonk-arion",
+    "dusk-plonk-gmimc",
+    "dusk-plonk-gmimc-2",
+    "dusk-plonk-grendel",
+    "dusk-plonk-griffin",
+    "dusk-plonk-neptune",
+    "dusk-plonk-poseidon",
+    "dusk-plonk-poseidon-2",
+    "dusk-plonk-rescue",
+    "dusk-plonk-rescue-prime",
+]
+resolver = "2"
+
+[workspace.dependencies]
+dusk-curves = { version = "0.2", default-features = false, features = ["zeroize"] }
+dusk-jubjub = { version = "0.15", default-features = false }
+dusk-plonk = { version = "0.23", default-features = false, features = ["alloc", "zeroize"] }
+dusk-safe = "0.3"
+criterion = "0.5"
+rand = { version = "0.8", default-features = false, features = ["getrandom", "std_rng"] }
+ff = { version = "0.13", default-features = false }
+once_cell = "1"
+dusk-bytes = "0.1"
+
+# Local dependencies
+dusk-plonk-anemoi = { path = "dusk-plonk-anemoi", version = "0.1.0" }
+dusk-plonk-arion = { path = "dusk-plonk-arion", version = "0.1.0" }
+dusk-plonk-gmimc = { path = "dusk-plonk-gmimc", version = "0.1.0" }
+dusk-plonk-grendel = { path = "dusk-plonk-grendel", version = "0.1.0" }
+dusk-plonk-griffin = { path = "dusk-plonk-griffin", version = "0.1.0" }
+dusk-plonk-gmimc-2 = { path = "dusk-plonk-gmimc-2", version = "0.1.0" }
+dusk-plonk-neptune = { path = "dusk-plonk-neptune", version = "0.1.0" }
+dusk-plonk-poseidon = { path = "dusk-plonk-poseidon", version = "0.1.0" }
+dusk-plonk-poseidon-2 = { path = "dusk-plonk-poseidon-2", version = "0.1.0" }
+dusk-plonk-rescue = { path = "dusk-plonk-rescue", version = "0.1.0" }
+dusk-plonk-rescue-prime = { path = "dusk-plonk-rescue-prime", version = "0.1.0" }
+
+
+[profile.dev]
+opt-level = 3
+debug = false
+rpath = false
+lto = false
+debug-assertions = false
+codegen-units = 16
+panic = 'unwind'
+incremental = false
+overflow-checks = false
+
+[profile.release]
+debug = false
+panic = 'abort'
+lto = true
+incremental = false
+codegen-units = 1
+
+[workspace.package]
+description = "Implementation of ZK-friendly hash functions in Dusk Network Plonk."
+categories = ["algorithms", "cryptography", "no-std", "wasm"]
+keywords = ["cryptography", "zero-knowledge", "crypto"]
+version = "0.1.0"
+edition = "2024"
+rust-version = "1.85"

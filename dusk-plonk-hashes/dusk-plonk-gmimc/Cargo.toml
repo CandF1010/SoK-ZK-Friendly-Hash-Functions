@@ -1,0 +1,49 @@
+[package]
+name = "dusk-plonk-gmimc"
+description = "An implementation of GMiMC."
+version.workspace = true
+edition.workspace = true
+keywords.workspace = true
+categories.workspace = true
+
+[dependencies]
+dusk-curves.workspace = true
+dusk-jubjub.workspace = true
+dusk-plonk = { workspace = true, optional = true }
+dusk-safe.workspace = true
+
+[dev-dependencies]
+criterion.workspace = true
+rand.workspace = true
+ff.workspace = true
+once_cell.workspace = true
+dusk-bytes.workspace = true
+
+[features]
+zk = [
+    "dep:dusk-plonk",
+]
+encryption = ["dusk-safe/encryption"]
+bls-backend-dusk = [
+    "dusk-curves/bls-backend-dusk",
+    "dusk-plonk?/bls-backend-dusk",
+]
+bls-backend-blst = [
+    "dusk-curves/bls-backend-blst",
+    "dusk-plonk?/bls-backend-blst",
+]
+
+[[bench]]
+name = "gmimc_hash"
+harness = false
+required-features = ["zk"]
+
+[[bench]]
+name = "gmimc_encrypt"
+harness = false
+required-features = ["zk", "encryption"]
+
+[[bench]]
+name = "gmimc_decrypt"
+harness = false
+required-features = ["zk", "encryption"]
