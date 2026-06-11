@@ -1,0 +1,25 @@
+[package]
+name = "p3-gmimc"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+p3-field.workspace = true
+p3-symmetric.workspace = true
+rand.workspace = true
+
+[dev-dependencies]
+p3-baby-bear.workspace = true
+p3-bn254.workspace = true
+p3-koala-bear.workspace = true
+p3-mersenne-31.workspace = true
+p3-goldilocks.workspace = true
+p3-util.workspace = true
+criterion.workspace = true
+tracing.workspace = true
+tracing-subscriber = { workspace = true, features = ["std", "env-filter"] }
+tracing-forest = { workspace = true, features = ["ansi", "smallvec"] }
+
+[[bench]]
+name = "gmimc"
+harness = false
