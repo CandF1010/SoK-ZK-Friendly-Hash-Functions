@@ -2,6 +2,7 @@
 members = [
     "p3-gmimc",
     "p3-gmimc-2",
+    "p3-xhash",
 ]
 
 resolver = "3"
@@ -20,6 +21,7 @@ p3-goldilocks     = { git = "https://github.com/Plonky3/Plonky3.git" }
 p3-keccak         = { git = "https://github.com/Plonky3/Plonky3.git" }
 p3-koala-bear     = { git = "https://github.com/Plonky3/Plonky3.git" }
 p3-matrix         = { git = "https://github.com/Plonky3/Plonky3.git" }
+p3-mds            = { git = "https://github.com/Plonky3/Plonky3.git" }
 p3-maybe-rayon    = { git = "https://github.com/Plonky3/Plonky3.git" }
 p3-merkle-tree    = { git = "https://github.com/Plonky3/Plonky3.git" }
 p3-mersenne-31    = { git = "https://github.com/Plonky3/Plonky3.git" }
@@ -35,7 +37,9 @@ tracing-subscriber = "0.3.22"
 rand = { version = "0.10.0", default-features = false }
 criterion = "0.8"
 clap = { version = "4.5.60", features = ["derive"] }
+shake = { version = "0.1.0", default-features = false }
 
 # Local dependencies
 p3-gmimc = {path = "p3-gmimc", version = "0.1.0" }
 p3-gmimc-2 = {path = "p3-gmimc-2", version = "0.1.0" }
+p3-xhash = {path = "p3-xhash", version = "0.1.0" }

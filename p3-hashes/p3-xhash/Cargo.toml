@@ -1,0 +1,22 @@
+[package]
+name = "p3-xhash"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+p3-baby-bear.workspace = true
+p3-field.workspace = true
+p3-goldilocks.workspace = true
+p3-koala-bear.workspace = true
+p3-mds.workspace = true
+p3-mersenne-31.workspace = true
+p3-symmetric.workspace = true
+
+shake.workspace = true
+
+[dev-dependencies]
+criterion.workspace = true
+
+[[bench]]
+name = "xhash"
+harness = false
