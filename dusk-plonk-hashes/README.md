@@ -4,7 +4,7 @@ The following hash functions are implemented:
 - Anemoi
 - Arion
 - GMiMC
-- GMiMC2.0
+- GMiMC2
 - Grendel
 - Griffin
 - Poseidon
