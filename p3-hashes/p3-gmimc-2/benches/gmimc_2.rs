@@ -29,33 +29,38 @@ const ROUNDS_4_8: usize = 64;
 fn bench_gmimc_2(c: &mut Criterion) {
     // BabyBear
     gmimc_2::<BabyBear, 16, 2, ROUNDS_16>(c);
-    gmimc_2::<BabyBear, 24, 2, ROUNDS_24>(c);
-
     gmimc_2::<BabyBear, 16, 4, ROUNDS_16>(c);
     gmimc_2::<BabyBear, 16, 8, ROUNDS_16>(c);
+    
+    gmimc_2::<BabyBear, 24, 2, ROUNDS_24>(c);
+    gmimc_2::<BabyBear, 24, 4, ROUNDS_16>(c);
+    gmimc_2::<BabyBear, 24, 8, ROUNDS_16>(c);
 
     // KoalaBear
     gmimc_2::<KoalaBear, 16, 2,ROUNDS_16>(c);
-    gmimc_2::<KoalaBear, 24, 2,ROUNDS_24>(c);
-
     gmimc_2::<KoalaBear, 16, 4,ROUNDS_16>(c);
     gmimc_2::<KoalaBear, 16, 8,ROUNDS_16>(c);
 
+    gmimc_2::<KoalaBear, 24, 2,ROUNDS_24>(c);
+    gmimc_2::<KoalaBear, 24, 4,ROUNDS_16>(c);
+    gmimc_2::<KoalaBear, 24, 8,ROUNDS_16>(c);
+
     // Mersenne31
     gmimc_2::<Mersenne31, 16, 2,ROUNDS_16>(c);
-    gmimc_2::<Mersenne31, 24, 2, ROUNDS_24>(c);
-
     gmimc_2::<Mersenne31, 16, 4,ROUNDS_16>(c);
     gmimc_2::<Mersenne31, 16, 8,ROUNDS_16>(c);
 
+    gmimc_2::<Mersenne31, 24, 2, ROUNDS_24>(c);
+    gmimc_2::<Mersenne31, 24, 4,ROUNDS_16>(c);
+    gmimc_2::<Mersenne31, 24, 8,ROUNDS_16>(c);
+
     // Goldilocks
     gmimc_2::<Goldilocks, 8, 2,ROUNDS_8_2>(c);
-    gmimc_2::<Goldilocks, 12, 2,ROUNDS_12_2>(c);
-
     gmimc_2::<Goldilocks, 8, 4,ROUNDS_8_4>(c);
-    gmimc_2::<Goldilocks, 12, 4,ROUNDS_12_4>(c);
-
     gmimc_2::<Goldilocks, 8, 8,ROUNDS_8_8>(c);
+
+    gmimc_2::<Goldilocks, 12, 2,ROUNDS_12_2>(c);
+    gmimc_2::<Goldilocks, 12, 4,ROUNDS_12_4>(c);
     gmimc_2::<Goldilocks, 12, 8,ROUNDS_12_8>(c);
 
     // BN254
