@@ -1,10 +1,6 @@
 use super::arion::ArionParams;
-use crate::fields::babybear::BabyBear;
 use crate::fields::bls12_381::Bls12_381;
 use crate::fields::bn254::Bn254;
-
-use crate::fields::koalabear::KoalaBear;
-use crate::fields::mersenne31::Mersenne31;
 use crate::fields::{FieldElement, PrimeField};
 use crate::utils::read_field_from_shake;
 use num_traits::Zero;
@@ -191,22 +187,4 @@ lazy_static! {
     // -- BLS12-381, t=3 --
     pub static ref ARION_BLS12_381_3_PARAMS: Arc<ArionParams<Bls12_381>> =
         generate_params::<Bls12_381>(3, "Arion-BLS12_381-3");
-
-    // -- Mersenne31, t=16 --
-    pub static ref ARION_MERSENNE31_16_PARAMS: Arc<ArionParams<Mersenne31>> =
-        generate_params::<Mersenne31>(16, "Arion-Mersenne31-16");
-    pub static ref ARION_MERSENNE31_24_PARAMS: Arc<ArionParams<Mersenne31>> =
-        generate_params::<Mersenne31>(24, "Arion-Mersenne31-24");
-
-    // -- BabyBear, t=16 --
-    pub static ref ARION_BABYBEAR_16_PARAMS: Arc<ArionParams<BabyBear>> =
-        generate_params::<BabyBear>(16, "Arion-BabyBear-16");
-    pub static ref ARION_BABYBEAR_24_PARAMS: Arc<ArionParams<BabyBear>> =
-        generate_params::<BabyBear>(24, "Arion-BabyBear-24");
-
-    // -- KoalaBear, t=16 --
-    pub static ref ARION_KOALABEAR_16_PARAMS: Arc<ArionParams<KoalaBear>> =
-        generate_params::<KoalaBear>(16, "Arion-KoalaBear-16");
-    pub static ref ARION_KOALABEAR_24_PARAMS: Arc<ArionParams<KoalaBear>> =
-        generate_params::<KoalaBear>(24, "Arion-KoalaBear-24");
 }

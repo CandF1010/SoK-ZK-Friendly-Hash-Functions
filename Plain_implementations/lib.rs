@@ -7,10 +7,8 @@ pub mod poseidon2;
 pub mod poseidon;
 #[path = "Anemoi/mod.rs"]
 pub mod anemoi;
-#[path = "GmimcErf/mod.rs"]
-pub mod gmimc_erf;
-#[path = "SgmiMc/mod.rs"]
-pub mod sgmimc;
+#[path = "Gmimc2/mod.rs"]
+pub mod gmimc2;
 #[path = "Rescueprime/mod.rs"]
 pub mod rescueprime;
 #[path = "Griffin/mod.rs"]

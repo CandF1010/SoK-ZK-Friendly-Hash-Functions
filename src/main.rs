@@ -56,17 +56,15 @@ use sok_zk_friendly_hash_functions::rescueprime::instances::{
     RESCUE_PRIME_GOLDILOCKS_12_PARAMS, RESCUE_PRIME_GOLDILOCKS_8_PARAMS,
 };
 use sok_zk_friendly_hash_functions::rescueprime::rescue_prime::RescuePrime;
-use sok_zk_friendly_hash_functions::sgmimc::instances::{
-    SGMIMC_ALPHA8_BLS12_381_2_PARAMS, SGMIMC_ALPHA8_BLS12_381_3_PARAMS,
-    SGMIMC_ALPHA8_BN254_2_PARAMS, SGMIMC_ALPHA8_BN254_3_PARAMS,
-    SGMIMC_BABYBEAR_16_PARAMS, SGMIMC_BABYBEAR_24_PARAMS,
-    SGMIMC_BLS12_381_2_PARAMS, SGMIMC_BLS12_381_3_PARAMS,
-    SGMIMC_BN254_2_PARAMS, SGMIMC_BN254_3_PARAMS,
-    SGMIMC_GOLDILOCKS_12_PARAMS, SGMIMC_GOLDILOCKS_8_PARAMS,
-    SGMIMC_KOALABEAR_16_PARAMS, SGMIMC_KOALABEAR_24_PARAMS,
-    SGMIMC_MERSENNE31_16_PARAMS, SGMIMC_MERSENNE31_24_PARAMS,
+use sok_zk_friendly_hash_functions::gmimc2::instances::{
+    GMIMC2_BABYBEAR_16_PARAMS, GMIMC2_BABYBEAR_24_PARAMS,
+    GMIMC2_BLS12_381_2_PARAMS, GMIMC2_BLS12_381_3_PARAMS,
+    GMIMC2_BN254_2_PARAMS, GMIMC2_BN254_3_PARAMS,
+    GMIMC2_GOLDILOCKS_12_PARAMS, GMIMC2_GOLDILOCKS_8_PARAMS,
+    GMIMC2_KOALABEAR_16_PARAMS, GMIMC2_KOALABEAR_24_PARAMS,
+    GMIMC2_MERSENNE31_16_PARAMS, GMIMC2_MERSENNE31_24_PARAMS,
 };
-use sok_zk_friendly_hash_functions::sgmimc::sgmimc::SgmiMc;
+use sok_zk_friendly_hash_functions::gmimc2::gmimc2::Gmimc2;
 use sok_zk_friendly_hash_functions::tip5::instances::TIP5_GOLDILOCKS_PARAMS;
 use sok_zk_friendly_hash_functions::tip5::tip5::{Tip5, Tip5Field};
 use sok_zk_friendly_hash_functions::plain_hashes;
@@ -82,31 +80,23 @@ fn main() {
     // Type-1: S-GMiMC / Poseidon2 / Neptune
     // ============================================================
 
-    // --- S-GMiMC (α=2, square S-box) ---
+    // --- GMiMC2 (square S-box) ---
 
-    println!("\n== S-GMiMC(alpha=2) state ~512 ==");
-    bench_sgmimc("S-GMiMC(alpha=2) BN254 t=2", &SgmiMc::new(&SGMIMC_BN254_2_PARAMS), ITERS);
-    bench_sgmimc("S-GMiMC(alpha=2) BLS12-381 t=2", &SgmiMc::new(&SGMIMC_BLS12_381_2_PARAMS), ITERS);
-    bench_sgmimc("S-GMiMC(alpha=2) Goldilocks t=8", &SgmiMc::new(&SGMIMC_GOLDILOCKS_8_PARAMS), ITERS);
-    bench_sgmimc("S-GMiMC(alpha=2) BabyBear t=16", &SgmiMc::new(&SGMIMC_BABYBEAR_16_PARAMS), ITERS);
-    bench_sgmimc("S-GMiMC(alpha=2) KoalaBear t=16", &SgmiMc::new(&SGMIMC_KOALABEAR_16_PARAMS), ITERS);
-    bench_sgmimc("S-GMiMC(alpha=2) Mersenne31 t=16", &SgmiMc::new(&SGMIMC_MERSENNE31_16_PARAMS), ITERS);
+    println!("\n== GMiMC2 state ~512 ==");
+    bench_gmimc2("GMiMC2 BN254 t=2", &Gmimc2::new(&GMIMC2_BN254_2_PARAMS), ITERS);
+    bench_gmimc2("GMiMC2 BLS12-381 t=2", &Gmimc2::new(&GMIMC2_BLS12_381_2_PARAMS), ITERS);
+    bench_gmimc2("GMiMC2 Goldilocks t=8", &Gmimc2::new(&GMIMC2_GOLDILOCKS_8_PARAMS), ITERS);
+    bench_gmimc2("GMiMC2 BabyBear t=16", &Gmimc2::new(&GMIMC2_BABYBEAR_16_PARAMS), ITERS);
+    bench_gmimc2("GMiMC2 KoalaBear t=16", &Gmimc2::new(&GMIMC2_KOALABEAR_16_PARAMS), ITERS);
+    bench_gmimc2("GMiMC2 Mersenne31 t=16", &Gmimc2::new(&GMIMC2_MERSENNE31_16_PARAMS), ITERS);
 
-    println!("\n== S-GMiMC(alpha=2) state ~768 ==");
-    bench_sgmimc("S-GMiMC(alpha=2) BN254 t=3", &SgmiMc::new(&SGMIMC_BN254_3_PARAMS), ITERS);
-    bench_sgmimc("S-GMiMC(alpha=2) BLS12-381 t=3", &SgmiMc::new(&SGMIMC_BLS12_381_3_PARAMS), ITERS);
-    bench_sgmimc("S-GMiMC(alpha=2) Goldilocks t=12", &SgmiMc::new(&SGMIMC_GOLDILOCKS_12_PARAMS), ITERS);
-    bench_sgmimc("S-GMiMC(alpha=2) BabyBear t=24", &SgmiMc::new(&SGMIMC_BABYBEAR_24_PARAMS), ITERS);
-    bench_sgmimc("S-GMiMC(alpha=2) KoalaBear t=24", &SgmiMc::new(&SGMIMC_KOALABEAR_24_PARAMS), ITERS);
-    bench_sgmimc("S-GMiMC(alpha=2) Mersenne31 t=24", &SgmiMc::new(&SGMIMC_MERSENNE31_24_PARAMS), ITERS);
-
-    // --- S-GMiMC (α=8, 256-bit only — optimal for large fields per Matthias) ---
-
-    println!("\n== S-GMiMC(alpha=8) (~256-bit fields) ==");
-    bench_sgmimc("S-GMiMC(alpha=8) BN254 t=2", &SgmiMc::new(&SGMIMC_ALPHA8_BN254_2_PARAMS), ITERS);
-    bench_sgmimc("S-GMiMC(alpha=8) BN254 t=3", &SgmiMc::new(&SGMIMC_ALPHA8_BN254_3_PARAMS), ITERS);
-    bench_sgmimc("S-GMiMC(alpha=8) BLS12-381 t=2", &SgmiMc::new(&SGMIMC_ALPHA8_BLS12_381_2_PARAMS), ITERS);
-    bench_sgmimc("S-GMiMC(alpha=8) BLS12-381 t=3", &SgmiMc::new(&SGMIMC_ALPHA8_BLS12_381_3_PARAMS), ITERS);
+    println!("\n== GMiMC2 state ~768 ==");
+    bench_gmimc2("GMiMC2 BN254 t=3", &Gmimc2::new(&GMIMC2_BN254_3_PARAMS), ITERS);
+    bench_gmimc2("GMiMC2 BLS12-381 t=3", &Gmimc2::new(&GMIMC2_BLS12_381_3_PARAMS), ITERS);
+    bench_gmimc2("GMiMC2 Goldilocks t=12", &Gmimc2::new(&GMIMC2_GOLDILOCKS_12_PARAMS), ITERS);
+    bench_gmimc2("GMiMC2 BabyBear t=24", &Gmimc2::new(&GMIMC2_BABYBEAR_24_PARAMS), ITERS);
+    bench_gmimc2("GMiMC2 KoalaBear t=24", &Gmimc2::new(&GMIMC2_KOALABEAR_24_PARAMS), ITERS);
+    bench_gmimc2("GMiMC2 Mersenne31 t=24", &Gmimc2::new(&GMIMC2_MERSENNE31_24_PARAMS), ITERS);
 
     // --- Poseidon2 ---
 
@@ -224,7 +214,7 @@ fn main() {
 
 // --- Benchmark helpers ---
 
-fn bench_sgmimc<F: FieldElement>(label: &str, perm: &SgmiMc<F>, iters: usize) {
+fn bench_gmimc2<F: FieldElement>(label: &str, perm: &Gmimc2<F>, iters: usize) {
     let input = make_input::<F>(perm.get_t());
     bench_with_input(label, iters, &input, |inp| perm.permutation(inp));
 }

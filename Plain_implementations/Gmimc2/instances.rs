@@ -1,4 +1,4 @@
-use super::gmimc_erf::GmimcErfParams;
+use super::gmimc2::Gmimc2Params;
 use crate::fields::babybear::BabyBear;
 use crate::fields::bls12_381::Bls12_381;
 use crate::fields::bn254::Bn254;
@@ -14,7 +14,7 @@ fn f_from_words<F: PrimeField>(words: [u64; 4]) -> F {
 }
 
 lazy_static! {
-    pub static ref GMIMC_ERF_BN254_2_PARAMS: Arc<GmimcErfParams<Bn254>> = {
+    pub static ref GMIMC2_BN254_2_PARAMS: Arc<Gmimc2Params<Bn254>> = {
         let round_constants: Vec<Bn254> = vec![
             f_from_words::<Bn254>([0x561b957379a02ddeu64, 0x1ac5c26643c2b85du64, 0xf452658b0bd96728u64, 0x2b70a65cc52d0aa1u64]),
             f_from_words::<Bn254>([0x7b502dd962d53060u64, 0xfcc6201bfde3b640u64, 0xa50e7c3b8d5b4a6eu64, 0x1a89194d2a6c8902u64]),
@@ -342,9 +342,9 @@ lazy_static! {
             f_from_words::<Bn254>([0x2a16027a30d09c7cu64, 0xf31fc8a5cf6789cdu64, 0x210964196ce7c639u64, 0x10b2386c33643a77u64]),
             f_from_words::<Bn254>([0x9f75432c8efa994du64, 0xf9867a21c27f7a94u64, 0x4b5d46d442180ce1u64, 0x1426ebfb7e107ec0u64]),
         ];
-        Arc::new(GmimcErfParams::new(2, 2, 325, &round_constants))
+        Arc::new(Gmimc2Params::new(2, 325, &round_constants))
     };
-    pub static ref GMIMC_ERF_BN254_3_PARAMS: Arc<GmimcErfParams<Bn254>> = {
+    pub static ref GMIMC2_BN254_3_PARAMS: Arc<Gmimc2Params<Bn254>> = {
         let round_constants: Vec<Bn254> = vec![
             f_from_words::<Bn254>([0x561b957379a02ddeu64, 0x1ac5c26643c2b85du64, 0xf452658b0bd96728u64, 0x2b70a65cc52d0aa1u64]),
             f_from_words::<Bn254>([0x7b502dd962d53060u64, 0xfcc6201bfde3b640u64, 0xa50e7c3b8d5b4a6eu64, 0x1a89194d2a6c8902u64]),
@@ -674,9 +674,9 @@ lazy_static! {
             f_from_words::<Bn254>([0x01c633d3220cdb1bu64, 0x158bae0fdb3556dau64, 0x41e843a718eef49du64, 0x2785ed8bb3348340u64]),
             f_from_words::<Bn254>([0x2ea0763b63d6fc31u64, 0x798edc0ee9a7373bu64, 0x6f5bfdcafb66b906u64, 0x1eb6080c95b77be0u64]),
         ];
-        Arc::new(GmimcErfParams::new(3, 2, 327, &round_constants))
+        Arc::new(Gmimc2Params::new(3, 327, &round_constants))
     };
-    pub static ref GMIMC_ERF_BLS12_381_2_PARAMS: Arc<GmimcErfParams<Bls12_381>> = {
+    pub static ref GMIMC2_BLS12_381_2_PARAMS: Arc<Gmimc2Params<Bls12_381>> = {
         let round_constants: Vec<Bls12_381> = vec![
             f_from_words::<Bls12_381>([0x7c4c8652c027e6acu64, 0x266f2f0febabe849u64, 0xd59f20e43d04e361u64, 0x1baa67527dcc9220u64]),
             f_from_words::<Bls12_381>([0x471cbaef7e8f11fcu64, 0x1587064f6ff944beu64, 0x4a82b3bf04c4b971u64, 0x4832ecee81a170eau64]),
@@ -1005,9 +1005,9 @@ lazy_static! {
             f_from_words::<Bls12_381>([0x240e10821e92618eu64, 0x4d32bef91c810b1cu64, 0x9381c09b623f3841u64, 0x50c6752718dacc01u64]),
             f_from_words::<Bls12_381>([0x5966d2c2e10a14fau64, 0x5cb99f01183fd6cfu64, 0x1b52dd38aa89bb65u64, 0x0018347e2a5be401u64]),
         ];
-        Arc::new(GmimcErfParams::new(2, 2, 326, &round_constants))
+        Arc::new(Gmimc2Params::new(2, 326, &round_constants))
     };
-    pub static ref GMIMC_ERF_BLS12_381_3_PARAMS: Arc<GmimcErfParams<Bls12_381>> = {
+    pub static ref GMIMC2_BLS12_381_3_PARAMS: Arc<Gmimc2Params<Bls12_381>> = {
         let round_constants: Vec<Bls12_381> = vec![
             f_from_words::<Bls12_381>([0x7c4c8652c027e6acu64, 0x266f2f0febabe849u64, 0xd59f20e43d04e361u64, 0x1baa67527dcc9220u64]),
             f_from_words::<Bls12_381>([0x471cbaef7e8f11fcu64, 0x1587064f6ff944beu64, 0x4a82b3bf04c4b971u64, 0x4832ecee81a170eau64]),
@@ -1338,9 +1338,9 @@ lazy_static! {
             f_from_words::<Bls12_381>([0x90170cbf9481eaf9u64, 0x8f376ea17e4fbd04u64, 0xb73148a2617f01cbu64, 0x5c6b00d2d7504149u64]),
             f_from_words::<Bls12_381>([0x395c3261577fd822u64, 0x175113f62c096dc0u64, 0x0aeb376bab956630u64, 0x09980529efcb16ccu64]),
         ];
-        Arc::new(GmimcErfParams::new(3, 2, 328, &round_constants))
+        Arc::new(Gmimc2Params::new(3, 328, &round_constants))
     };
-    pub static ref GMIMC_ERF_GOLDILOCKS_8_PARAMS: Arc<GmimcErfParams<Goldilocks>> = {
+    pub static ref GMIMC2_GOLDILOCKS_8_PARAMS: Arc<Gmimc2Params<Goldilocks>> = {
         let round_constants: Vec<Goldilocks> = vec![
             f_from_words::<Goldilocks>([0x5ca8f0cbcd2ea006u64, 0x0000000000000000u64, 0x0000000000000000u64, 0x0000000000000000u64]),
             f_from_words::<Goldilocks>([0x9a333d86ded8842eu64, 0x0000000000000000u64, 0x0000000000000000u64, 0x0000000000000000u64]),
@@ -1489,9 +1489,9 @@ lazy_static! {
             f_from_words::<Goldilocks>([0x0331b87ae67c1232u64, 0x0000000000000000u64, 0x0000000000000000u64, 0x0000000000000000u64]),
             f_from_words::<Goldilocks>([0x08e1319b5c706ef3u64, 0x0000000000000000u64, 0x0000000000000000u64, 0x0000000000000000u64]),
         ];
-        Arc::new(GmimcErfParams::new(8, 2, 146, &round_constants))
+        Arc::new(Gmimc2Params::new(8, 146, &round_constants))
     };
-    pub static ref GMIMC_ERF_GOLDILOCKS_12_PARAMS: Arc<GmimcErfParams<Goldilocks>> = {
+    pub static ref GMIMC2_GOLDILOCKS_12_PARAMS: Arc<Gmimc2Params<Goldilocks>> = {
         let round_constants: Vec<Goldilocks> = vec![
             f_from_words::<Goldilocks>([0x5ca8f0cbcd2ea006u64, 0x0000000000000000u64, 0x0000000000000000u64, 0x0000000000000000u64]),
             f_from_words::<Goldilocks>([0x9a333d86ded8842eu64, 0x0000000000000000u64, 0x0000000000000000u64, 0x0000000000000000u64]),
@@ -1808,9 +1808,9 @@ lazy_static! {
             f_from_words::<Goldilocks>([0xd5523e833e3b23b5u64, 0x0000000000000000u64, 0x0000000000000000u64, 0x0000000000000000u64]),
             f_from_words::<Goldilocks>([0x0e43dc4f50c6eb0du64, 0x0000000000000000u64, 0x0000000000000000u64, 0x0000000000000000u64]),
         ];
-        Arc::new(GmimcErfParams::new(12, 2, 314, &round_constants))
+        Arc::new(Gmimc2Params::new(12, 314, &round_constants))
     };
-    pub static ref GMIMC_ERF_BABYBEAR_16_PARAMS: Arc<GmimcErfParams<BabyBear>> = {
+    pub static ref GMIMC2_BABYBEAR_16_PARAMS: Arc<Gmimc2Params<BabyBear>> = {
         let round_constants: Vec<BabyBear> = vec![
             f_from_words::<BabyBear>([0x00000000513d584eu64, 0x0000000000000000u64, 0x0000000000000000u64, 0x0000000000000000u64]),
             f_from_words::<BabyBear>([0x0000000011be30aau64, 0x0000000000000000u64, 0x0000000000000000u64, 0x0000000000000000u64]),
@@ -2359,9 +2359,9 @@ lazy_static! {
             f_from_words::<BabyBear>([0x000000006192a9aau64, 0x0000000000000000u64, 0x0000000000000000u64, 0x0000000000000000u64]),
             f_from_words::<BabyBear>([0x0000000061fefa7eu64, 0x0000000000000000u64, 0x0000000000000000u64, 0x0000000000000000u64]),
         ];
-        Arc::new(GmimcErfParams::new(16, 2, 546, &round_constants))
+        Arc::new(Gmimc2Params::new(16, 546, &round_constants))
     };
-    pub static ref GMIMC_ERF_BABYBEAR_24_PARAMS: Arc<GmimcErfParams<BabyBear>> = {
+    pub static ref GMIMC2_BABYBEAR_24_PARAMS: Arc<Gmimc2Params<BabyBear>> = {
         let round_constants: Vec<BabyBear> = vec![
             f_from_words::<BabyBear>([0x00000000513d584eu64, 0x0000000000000000u64, 0x0000000000000000u64, 0x0000000000000000u64]),
             f_from_words::<BabyBear>([0x0000000011be30aau64, 0x0000000000000000u64, 0x0000000000000000u64, 0x0000000000000000u64]),
@@ -3566,9 +3566,9 @@ lazy_static! {
             f_from_words::<BabyBear>([0x000000004958087cu64, 0x0000000000000000u64, 0x0000000000000000u64, 0x0000000000000000u64]),
             f_from_words::<BabyBear>([0x000000004353bef6u64, 0x0000000000000000u64, 0x0000000000000000u64, 0x0000000000000000u64]),
         ];
-        Arc::new(GmimcErfParams::new(24, 2, 1202, &round_constants))
+        Arc::new(Gmimc2Params::new(24, 1202, &round_constants))
     };
-    pub static ref GMIMC_ERF_KOALABEAR_16_PARAMS: Arc<GmimcErfParams<KoalaBear>> = {
+    pub static ref GMIMC2_KOALABEAR_16_PARAMS: Arc<Gmimc2Params<KoalaBear>> = {
         let round_constants: Vec<KoalaBear> = vec![
             f_from_words::<KoalaBear>([0x000000003c14f38bu64, 0x0000000000000000u64, 0x0000000000000000u64, 0x0000000000000000u64]),
             f_from_words::<KoalaBear>([0x000000004084221eu64, 0x0000000000000000u64, 0x0000000000000000u64, 0x0000000000000000u64]),
@@ -4117,9 +4117,9 @@ lazy_static! {
             f_from_words::<KoalaBear>([0x0000000057ca2b46u64, 0x0000000000000000u64, 0x0000000000000000u64, 0x0000000000000000u64]),
             f_from_words::<KoalaBear>([0x000000004c9e0f96u64, 0x0000000000000000u64, 0x0000000000000000u64, 0x0000000000000000u64]),
         ];
-        Arc::new(GmimcErfParams::new(16, 2, 546, &round_constants))
+        Arc::new(Gmimc2Params::new(16, 546, &round_constants))
     };
-    pub static ref GMIMC_ERF_KOALABEAR_24_PARAMS: Arc<GmimcErfParams<KoalaBear>> = {
+    pub static ref GMIMC2_KOALABEAR_24_PARAMS: Arc<Gmimc2Params<KoalaBear>> = {
         let round_constants: Vec<KoalaBear> = vec![
             f_from_words::<KoalaBear>([0x000000003c14f38bu64, 0x0000000000000000u64, 0x0000000000000000u64, 0x0000000000000000u64]),
             f_from_words::<KoalaBear>([0x000000004084221eu64, 0x0000000000000000u64, 0x0000000000000000u64, 0x0000000000000000u64]),
@@ -5324,9 +5324,9 @@ lazy_static! {
             f_from_words::<KoalaBear>([0x000000007276af54u64, 0x0000000000000000u64, 0x0000000000000000u64, 0x0000000000000000u64]),
             f_from_words::<KoalaBear>([0x0000000062ed9abcu64, 0x0000000000000000u64, 0x0000000000000000u64, 0x0000000000000000u64]),
         ];
-        Arc::new(GmimcErfParams::new(24, 2, 1202, &round_constants))
+        Arc::new(Gmimc2Params::new(24, 1202, &round_constants))
     };
-    pub static ref GMIMC_ERF_MERSENNE31_16_PARAMS: Arc<GmimcErfParams<Mersenne31>> = {
+    pub static ref GMIMC2_MERSENNE31_16_PARAMS: Arc<Gmimc2Params<Mersenne31>> = {
         let round_constants: Vec<Mersenne31> = vec![
             f_from_words::<Mersenne31>([0x0000000016654349u64, 0x0000000000000000u64, 0x0000000000000000u64, 0x0000000000000000u64]),
             f_from_words::<Mersenne31>([0x0000000027f405dau64, 0x0000000000000000u64, 0x0000000000000000u64, 0x0000000000000000u64]),
@@ -5875,9 +5875,9 @@ lazy_static! {
             f_from_words::<Mersenne31>([0x000000001a959edau64, 0x0000000000000000u64, 0x0000000000000000u64, 0x0000000000000000u64]),
             f_from_words::<Mersenne31>([0x000000001c98ee22u64, 0x0000000000000000u64, 0x0000000000000000u64, 0x0000000000000000u64]),
         ];
-        Arc::new(GmimcErfParams::new(16, 2, 546, &round_constants))
+        Arc::new(Gmimc2Params::new(16, 546, &round_constants))
     };
-    pub static ref GMIMC_ERF_MERSENNE31_24_PARAMS: Arc<GmimcErfParams<Mersenne31>> = {
+    pub static ref GMIMC2_MERSENNE31_24_PARAMS: Arc<Gmimc2Params<Mersenne31>> = {
         let round_constants: Vec<Mersenne31> = vec![
             f_from_words::<Mersenne31>([0x0000000016654349u64, 0x0000000000000000u64, 0x0000000000000000u64, 0x0000000000000000u64]),
             f_from_words::<Mersenne31>([0x0000000027f405dau64, 0x0000000000000000u64, 0x0000000000000000u64, 0x0000000000000000u64]),
@@ -7082,45 +7082,8 @@ lazy_static! {
             f_from_words::<Mersenne31>([0x000000000b00a2b0u64, 0x0000000000000000u64, 0x0000000000000000u64, 0x0000000000000000u64]),
             f_from_words::<Mersenne31>([0x000000001fee4e41u64, 0x0000000000000000u64, 0x0000000000000000u64, 0x0000000000000000u64]),
         ];
-        Arc::new(GmimcErfParams::new(24, 2, 1202, &round_constants))
+        Arc::new(Gmimc2Params::new(24, 1202, &round_constants))
     };
 }
 
-lazy_static! {
-    pub static ref GMIMC_ERF_ALPHA3_BN254_2_PARAMS: Arc<GmimcErfParams<Bn254>> = Arc::new(
-        GmimcErfParams::new(2, 3, GMIMC_ERF_BN254_2_PARAMS.rounds, &GMIMC_ERF_BN254_2_PARAMS.round_constants),
-    );
-    pub static ref GMIMC_ERF_ALPHA3_BN254_3_PARAMS: Arc<GmimcErfParams<Bn254>> = Arc::new(
-        GmimcErfParams::new(3, 3, GMIMC_ERF_BN254_3_PARAMS.rounds, &GMIMC_ERF_BN254_3_PARAMS.round_constants),
-    );
-    pub static ref GMIMC_ERF_ALPHA3_BLS12_381_2_PARAMS: Arc<GmimcErfParams<Bls12_381>> = Arc::new(
-        GmimcErfParams::new(2, 3, GMIMC_ERF_BLS12_381_2_PARAMS.rounds, &GMIMC_ERF_BLS12_381_2_PARAMS.round_constants),
-    );
-    pub static ref GMIMC_ERF_ALPHA3_BLS12_381_3_PARAMS: Arc<GmimcErfParams<Bls12_381>> = Arc::new(
-        GmimcErfParams::new(3, 3, GMIMC_ERF_BLS12_381_3_PARAMS.rounds, &GMIMC_ERF_BLS12_381_3_PARAMS.round_constants),
-    );
-    pub static ref GMIMC_ERF_ALPHA3_GOLDILOCKS_8_PARAMS: Arc<GmimcErfParams<Goldilocks>> = Arc::new(
-        GmimcErfParams::new(8, 3, GMIMC_ERF_GOLDILOCKS_8_PARAMS.rounds, &GMIMC_ERF_GOLDILOCKS_8_PARAMS.round_constants),
-    );
-    pub static ref GMIMC_ERF_ALPHA3_GOLDILOCKS_12_PARAMS: Arc<GmimcErfParams<Goldilocks>> = Arc::new(
-        GmimcErfParams::new(12, 3, GMIMC_ERF_GOLDILOCKS_12_PARAMS.rounds, &GMIMC_ERF_GOLDILOCKS_12_PARAMS.round_constants),
-    );
-    pub static ref GMIMC_ERF_ALPHA3_BABYBEAR_16_PARAMS: Arc<GmimcErfParams<BabyBear>> = Arc::new(
-        GmimcErfParams::new(16, 3, GMIMC_ERF_BABYBEAR_16_PARAMS.rounds, &GMIMC_ERF_BABYBEAR_16_PARAMS.round_constants),
-    );
-    pub static ref GMIMC_ERF_ALPHA3_BABYBEAR_24_PARAMS: Arc<GmimcErfParams<BabyBear>> = Arc::new(
-        GmimcErfParams::new(24, 3, GMIMC_ERF_BABYBEAR_24_PARAMS.rounds, &GMIMC_ERF_BABYBEAR_24_PARAMS.round_constants),
-    );
-    pub static ref GMIMC_ERF_ALPHA3_KOALABEAR_16_PARAMS: Arc<GmimcErfParams<KoalaBear>> = Arc::new(
-        GmimcErfParams::new(16, 3, GMIMC_ERF_KOALABEAR_16_PARAMS.rounds, &GMIMC_ERF_KOALABEAR_16_PARAMS.round_constants),
-    );
-    pub static ref GMIMC_ERF_ALPHA3_KOALABEAR_24_PARAMS: Arc<GmimcErfParams<KoalaBear>> = Arc::new(
-        GmimcErfParams::new(24, 3, GMIMC_ERF_KOALABEAR_24_PARAMS.rounds, &GMIMC_ERF_KOALABEAR_24_PARAMS.round_constants),
-    );
-    pub static ref GMIMC_ERF_ALPHA3_MERSENNE31_16_PARAMS: Arc<GmimcErfParams<Mersenne31>> = Arc::new(
-        GmimcErfParams::new(16, 3, GMIMC_ERF_MERSENNE31_16_PARAMS.rounds, &GMIMC_ERF_MERSENNE31_16_PARAMS.round_constants),
-    );
-    pub static ref GMIMC_ERF_ALPHA3_MERSENNE31_24_PARAMS: Arc<GmimcErfParams<Mersenne31>> = Arc::new(
-        GmimcErfParams::new(24, 3, GMIMC_ERF_MERSENNE31_24_PARAMS.rounds, &GMIMC_ERF_MERSENNE31_24_PARAMS.round_constants),
-    );
-}
+// ALPHA3 variants removed — GMiMC2 only uses square S-box (d=2).

@@ -1,2 +1,2 @@
-pub mod gmimc_erf;
+pub mod gmimc2;
 pub mod instances;
