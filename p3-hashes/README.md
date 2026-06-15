@@ -3,6 +3,7 @@ This crate implements various Zero-Knowledge-friendly hash functions in [Plonky3
 The following hash functions are implemented:
 - GMiMC
 - GMiMC2
+- pSquare-hash
 - XHash
 
 The XHash implementation is forked from https://github.com/Plonky3/Plonky3/tree/robin/xhash commit `5428518c754e26674aa43712474b401253333673`.

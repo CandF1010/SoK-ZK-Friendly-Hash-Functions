@@ -2,6 +2,7 @@
 members = [
     "p3-gmimc",
     "p3-gmimc-2",
+    "p3-psquarehash",
     "p3-xhash",
 ]
 
@@ -40,6 +41,7 @@ clap = { version = "4.5.60", features = ["derive"] }
 shake = { version = "0.1.0", default-features = false }
 
 # Local dependencies
-p3-gmimc = {path = "p3-gmimc", version = "0.1.0" }
-p3-gmimc-2 = {path = "p3-gmimc-2", version = "0.1.0" }
-p3-xhash = {path = "p3-xhash", version = "0.1.0" }
+p3-gmimc = { path = "p3-gmimc", version = "0.1.0" }
+p3-gmimc-2 = { path = "p3-gmimc-2", version = "0.1.0" }
+p3-psquarehash = { path = "p3-psquarehash", version = "0.1.0" }
+p3-xhash = { path = "p3-xhash", version = "0.1.0" }
