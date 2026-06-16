@@ -2,7 +2,7 @@ use dusk_curves::bls12_381::BlsScalar;
 use dusk_plonk::prelude::*;
 use dusk_safe::Safe;
 
-use crate::neptune::{ALPHA, ALPHA_3, ALPHA_4, GAMMA, MATRIX_EXTERNAL_1, MATRIX_EXTERNAL_2, MATRIX_INTERNAL, ROUND_CONSTANTS, WIDTH};
+use crate::neptune::{ALPHA, GAMMA, MATRIX_EXTERNAL_1, MATRIX_EXTERNAL_2, MATRIX_INTERNAL, ROUND_CONSTANTS, WIDTH};
 
 use super::Neptune;
 
@@ -64,65 +64,68 @@ impl<'a> Neptune<Witness> for GadgetPermutation<'a> {
     }
 
     fn lm_s_box(&mut self, state: &mut [Witness]) {
-        // x - y
+        // z_1 = x_0 - x_1
         let constraint = Constraint::new()
             .left(1)
             .a(state[0])
             .right(-BlsScalar::one())
             .b(state[1]);
-        let diff_1 = self.composer.gate_add(constraint);
-        // x - 2 * y
+        let z_1 = self.composer.gate_add(constraint);
+        // z_2 = z_1^2
         let constraint = Constraint::new()
-            .left(1)
-            .a(diff_1)
-            .right(-BlsScalar::one())
-            .b(state[1]);
-        let diff_2 = self.composer.gate_add(constraint);
-        // (x - y)^2
-        let constraint = Constraint::new().mult(1).a(diff_1).b(diff_1);
-        let squ_1 = self.composer.gate_mul(constraint);
-        // GAMMA + ALPHA * (x - 2 * y) + (x - y)^2
+            .mult(1)
+            .a(z_1)
+            .b(z_1);
+        let z_2 = self.composer.gate_mul(constraint);
+        // z_3 = -z_2 + alpha * (x_0 - 2 * x_1) + gamma
         let constraint = Constraint::new()
-            .left(ALPHA)
-            .a(diff_2)
-            .right(1)
-            .b(squ_1)
+            .left(-BlsScalar::one())
+            .a(z_2)
+            .right(ALPHA)
+            .b(z_1)
+            .fourth(-ALPHA)
+            .d(state[1])
             .constant(GAMMA);
-        let diff_3 = self.composer.gate_add(constraint);
-        // (GAMMA + ALPHA * (x - 2 * y) + (x - y)^2)^2
-        let constraint = Constraint::new().mult(1).a(diff_3).b(diff_3);
-        let squ_2 = self.composer.gate_mul(constraint);
-        // 2 * x + y
+        let z_3 = self.composer.gate_add(constraint);
+        // z_4 = z_3^2
         let constraint = Constraint::new()
-            .left(2)
-            .a(state[0])
-            .right(1)
-            .b(state[1]);
-        let sum_1 = self.composer.gate_add(constraint);
-        // x + 3 * y
+            .mult(1)
+            .a(z_3)
+            .b(z_3);
+        let z_4 = self.composer.gate_mul(constraint);
+        // z_5 = 3 * alpha * z_2 + alpha^2 * (2 * x_0 + x_1)
         let constraint = Constraint::new()
-            .left(1)
-            .a(state[0])
-            .right(3)
-            .b(state[1]);
-        let sum_2 = self.composer.gate_add(constraint);
+            .left(ALPHA.double() + ALPHA)
+            .a(z_2)
+            .right(ALPHA.square().double())
+            .b(state[0])
+            .fourth(ALPHA.square())
+            .d(state[1]);
+        let z_5 = self.composer.gate_add(constraint);
+        // z_6 = 4 * alpha * z_2 + alpha^2 * (x_0 + 3 * x_1)
+        let constraint = Constraint::new()
+            .left(ALPHA.double().double())
+            .a(z_2)
+            .right(ALPHA.square())
+            .b(state[0])
+            .fourth(ALPHA.square().double() + ALPHA.square())
+            .d(state[1]);
+        let z_6 = self.composer.gate_add(constraint);
         
         let mut result = [Composer::ZERO; 2];
+        // y_0 = z_5 + z_4
         let constraint = Constraint::new()
-            .left(ALPHA.square())
-            .a(sum_1)
-            .right(ALPHA_3)
-            .b(squ_1)
-            .fourth(1)
-            .d(squ_2);
+            .left(1)
+            .a(z_5)
+            .right(1)
+            .b(z_4);
         result[0] = self.composer.gate_add(constraint);
+        // y_1 = z_6 + z_4
         let constraint = Constraint::new()
-            .left(ALPHA.square())
-            .a(sum_2)
-            .right(ALPHA_4)
-            .b(squ_1)
-            .fourth(1)
-            .d(squ_2);
+            .left(1)
+            .a(z_6)
+            .right(1)
+            .b(z_4);
         result[1] = self.composer.gate_add(constraint);
 
         state.copy_from_slice(&result);

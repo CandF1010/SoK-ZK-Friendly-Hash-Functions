@@ -7,9 +7,6 @@ const ROUNDS: usize = FULL_ROUNDS_INITIAL + FULL_ROUNDS_FINAL + PARTIAL_ROUNDS;
 pub const ALPHA: BlsScalar = BlsScalar::one();
 pub const GAMMA: BlsScalar = BlsScalar::from_raw([5, 0, 0, 0]);
 
-pub const ALPHA_3: BlsScalar = BlsScalar::from_raw([3, 0, 0, 0]);
-pub const ALPHA_4: BlsScalar = BlsScalar::from_raw([4, 0, 0, 0]);
-
 /// `ROUND_CONSTANTS` consists on a static reference that points to the
 /// pre-loaded 340 constant scalar of the bls12_381 curve.
 pub const ROUND_CONSTANTS: [[BlsScalar; WIDTH]; ROUNDS] = {

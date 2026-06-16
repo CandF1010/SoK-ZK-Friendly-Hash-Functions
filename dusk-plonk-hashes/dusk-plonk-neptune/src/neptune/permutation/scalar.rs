@@ -2,7 +2,7 @@ use dusk_curves::bls12_381::BlsScalar;
 use dusk_safe::Safe;
 
 use super::Neptune;
-use crate::neptune::{ALPHA, ALPHA_3, ALPHA_4, GAMMA, MATRIX_EXTERNAL_1, MATRIX_EXTERNAL_2, MATRIX_INTERNAL, ROUND_CONSTANTS, WIDTH};
+use crate::neptune::{ALPHA, GAMMA, MATRIX_EXTERNAL_1, MATRIX_EXTERNAL_2, MATRIX_INTERNAL, ROUND_CONSTANTS, WIDTH};
 
 /// An implementation of the [`Permutation`] for `BlsScalar` as input values.
 #[derive(Default)]
@@ -52,8 +52,8 @@ impl Neptune<BlsScalar> for ScalarPermutation {
         let diff_2 = diff_1 - state[1];
         // (x - y)^2
         let squ_1 = diff_1.square();
-        // GAMMA + ALPHA * (x - 2 * y) + (x - y)^2
-        let diff_3 = GAMMA + ALPHA * diff_2 + squ_1;
+        // GAMMA + ALPHA * (x - 2 * y) - (x - y)^2
+        let diff_3 = GAMMA + ALPHA * diff_2 - squ_1;
         // (GAMMA + ALPHA * (x - 2 * y) + (x - y)^2)^2
         let squ_2 = diff_3.square();
         // 2 * x + y
@@ -62,8 +62,8 @@ impl Neptune<BlsScalar> for ScalarPermutation {
         let sum_2 = state[0] + state[1].double() + state[1];
         
         let mut result = [BlsScalar::zero(); 2];
-        result[0] += ALPHA.square() * sum_1 + ALPHA_3 * squ_1 + squ_2;
-        result[1] += ALPHA.square() * sum_2 + ALPHA_4 * squ_1 + squ_2;
+        result[0] += ALPHA.square() * sum_1 + (ALPHA.double() + ALPHA) * squ_1 + squ_2;
+        result[1] += ALPHA.square() * sum_2 + ALPHA.double().double() * squ_1 + squ_2;
 
         state.copy_from_slice(&result);
     }
