@@ -2,7 +2,7 @@ use dusk_curves::bls12_381::BlsScalar;
 use dusk_safe::Safe;
 
 use super::Anemoi;
-use crate::anemoi::{FIVE_INV, G, G_INV, G_1, G_2, G_SQU_G_1, G_SQU_2G_1, ROUND_CONSTANTS, WIDTH};
+use crate::anemoi::{FIVE_INV, G, G_1, G_2, G_INV, G_SQU_1, G_SQU_2G_1, G_SQU_G_1, ROUND_CONSTANTS, WIDTH};
 
 /// An implementation of the [`Permutation`] for `BlsScalar` as input values.
 #[derive(Default)]
@@ -71,6 +71,23 @@ impl Anemoi<BlsScalar> for ScalarPermutation {
         result[1] += G_SQU_2G_1 * state[2] + G_SQU_G_1 * state[3];
         result[2] += G_SQU_2G_1 * state[0] + G_SQU_G_1 * state[1];
         result[3] += G_2 * state[2] + G_1 * state[3];
+
+        state.copy_from_slice(&result);
+    }
+
+    fn linear_layer_final(&mut self, state: &mut [BlsScalar; WIDTH]) {
+        // M_x
+        // 1,   g
+        // g,   g^2 + 1
+        //
+        // M_y
+        // g,   g^2 + 1
+        // 1,   g
+        let mut result = [BlsScalar::zero(); WIDTH];
+        result[0] += state[0] + G * state[1];
+        result[1] += G * state[0] + G_SQU_1 * state[1];
+        result[2] += G * state[2] + G_SQU_1 * state[3];
+        result[3] += state[2] + G * state[3];
 
         state.copy_from_slice(&result);
     }

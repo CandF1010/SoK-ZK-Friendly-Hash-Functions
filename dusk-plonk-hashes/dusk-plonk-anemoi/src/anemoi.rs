@@ -1,7 +1,7 @@
 mod permutation;
 mod constants;
 
-use constants::{G, G_INV, G_1, G_2, G_SQU_G_1, G_SQU_2G_1, ROUND_CONSTANTS};
+use constants::{G, G_INV, G_1, G_2, G_SQU_1, G_SQU_G_1, G_SQU_2G_1, ROUND_CONSTANTS};
 
 pub const ROUNDS: usize = 16;
 

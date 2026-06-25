@@ -3,7 +3,7 @@ use dusk_plonk::prelude::*;
 use dusk_safe::Safe;
 
 use super::Anemoi;
-use crate::anemoi::{FIVE_INV, G, G_INV, G_1, G_2, G_SQU_G_1, G_SQU_2G_1, ROUND_CONSTANTS, WIDTH};
+use crate::anemoi::{FIVE_INV, G, G_INV, G_1, G_2, G_SQU_1, G_SQU_G_1, G_SQU_2G_1, ROUND_CONSTANTS, WIDTH};
 
 
 /// An implementation for the Anemoi permutation operating on [`Witness`]es.
@@ -114,7 +114,34 @@ impl<'a> Anemoi<Witness> for GadgetPermutation<'a> {
         state.copy_from_slice(&result);
     }
 
+    fn linear_layer_final(&mut self, state: &mut [Witness; WIDTH]) {
+        // M_x
+        // 1,   g
+        // g,   g^2 + 1
+        //
+        // M_y
+        // g,   g^2 + 1
+        // 1,   g
+        let mut result = [Composer::ZERO; WIDTH];
+        
+        let constraint = Constraint::new().left(1).a(state[0]).right(G).b(state[1]);
+        result[0] = self.composer.gate_add(constraint);
+        let constraint = Constraint::new().left(G).a(state[0]).right(G_SQU_1).b(state[1]);
+        result[1] = self.composer.gate_add(constraint);
+        let constraint = Constraint::new().left(G).a(state[2]).right(G_SQU_1).b(state[3]);
+        result[2] = self.composer.gate_add(constraint);
+        let constraint = Constraint::new().left(1).a(state[2]).right(G).b(state[3]);
+        result[3] = self.composer.gate_add(constraint);
+
+        state.copy_from_slice(&result);
+    }
+
     fn affine_layer(&mut self, round: usize, state: &mut [Witness; WIDTH]) {
+        // Anemoi matrix for WITDH = 4 is given by
+        // 2 + g,        1 + g,       0,            0
+        // 0,            0,           g^2 + 2g + 1, g^2 + g + 1
+        // g^2 + 2g + 1, g^2 + g + 1, 0,          , 0
+        // 0,            0,         , 2 + g       , 1 + g
         let mut result = [Composer::ZERO; WIDTH];
         let c = ROUND_CONSTANTS[round];
 

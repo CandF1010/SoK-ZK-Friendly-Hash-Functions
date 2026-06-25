@@ -10,6 +10,7 @@ pub const G_INV: BlsScalar = BlsScalar::from_raw([
                                                     ]);
 pub const G_1: BlsScalar = BlsScalar::from_raw([8, 0, 0, 0]);
 pub const G_2: BlsScalar = BlsScalar::from_raw([9, 0, 0, 0]);
+pub const G_SQU_1: BlsScalar = BlsScalar::from_raw([50, 0, 0, 0]);
 pub const G_SQU_G_1: BlsScalar = BlsScalar::from_raw([57, 0, 0, 0]);
 pub const G_SQU_2G_1: BlsScalar = BlsScalar::from_raw([64, 0, 0, 0]);
 

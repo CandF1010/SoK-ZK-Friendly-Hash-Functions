@@ -28,6 +28,8 @@ pub(crate) trait Anemoi<T> {
 
     fn linear_layer(&mut self, state: &mut [T; WIDTH]);
 
+    fn linear_layer_final(&mut self, state: &mut [T; WIDTH]);
+
     // In Anemoi specification, constants are added before matrix.
     // We swap the to reduce Plonk constraints.
     fn affine_layer(&mut self, round: usize, state: &mut [T; WIDTH]);
@@ -39,6 +41,6 @@ pub(crate) trait Anemoi<T> {
         for round in 0..ROUNDS {
             self.round_function(round, state);
         }
-        self.linear_layer(state);
+        self.linear_layer_final(state);
     }
 }
