@@ -88,16 +88,14 @@ impl<'a> Grendel<Witness> for GadgetPermutation<'a> {
 
         let witness_gx = self.composer.append_witness(value_gx);
         let witness_y = self.composer.append_witness(value_y);
-        let constraint = Constraint::new().mult(1).a(witness_y).b(witness_y);
-        let witness_y_2 = self.composer.gate_mul(constraint);
+        let constraint = Constraint::new().mult(1).a(witness_y).b(witness_y).fourth(-BlsScalar::one()).d(witness_x);
+        let constraint_y_2_mx = self.composer.gate_mul(constraint);
 
-        let constraint = Constraint::new().left(1).a(witness_y_2).right(-BlsScalar::one()).b(witness_x);
-        let constraint_y_2_mx = self.composer.gate_add(constraint);
         let constraint = Constraint::new().mult(1).a(witness_l_p1).b(constraint_y_2_mx);
         let constraint_l_p1_y_2_mx = self.composer.gate_mul(constraint);
         self.composer.assert_equal(constraint_l_p1_y_2_mx, Composer::ZERO);
  
-        let constraint = Constraint::new().left(1).a(witness_y_2).right(-BlsScalar::one()).b(witness_gx);
+        let constraint = Constraint::new().mult(1).a(witness_y).b(witness_y).fourth(-BlsScalar::one()).d(witness_gx);
         let constraint_y_2_mgx = self.composer.gate_add(constraint);
         let constraint = Constraint::new().mult(1).a(witness_l_m1).b(constraint_y_2_mgx);
         let constraint_l_m1_y_2_mgx = self.composer.gate_mul(constraint);
