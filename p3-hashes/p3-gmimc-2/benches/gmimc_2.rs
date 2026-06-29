@@ -23,6 +23,7 @@ const ROUNDS_12_2: usize = 168;
 const ROUNDS_12_4: usize = 96;
 const ROUNDS_12_8: usize = 72;
 // 256 bit fields
+const ROUNDS_4_2: usize = 172;
 const ROUNDS_4_4: usize = 92;
 const ROUNDS_4_8: usize = 64;
 
@@ -64,6 +65,7 @@ fn bench_gmimc_2(c: &mut Criterion) {
     gmimc_2::<Goldilocks, 12, 8,ROUNDS_12_8>(c);
 
     // BN254
+    gmimc_2::<Bn254, 4, 2,ROUNDS_4_2>(c);
     gmimc_2::<Bn254, 4, 4,ROUNDS_4_4>(c);
     gmimc_2::<Bn254, 4, 8,ROUNDS_4_8>(c);
 }
