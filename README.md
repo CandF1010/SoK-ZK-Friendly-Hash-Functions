@@ -16,7 +16,7 @@ RUSTFLAGS='-C target-cpu=native' cargo run --release > results.txt
 ## Benchmarked Primitives
 
 **ZK-friendly hashes:**
-Poseidon, Poseidon2, Griffin, Anemoi, Rescue-Prime, GMiMC-ERF, S-GMiMC, Neptune, ReinforcedConcrete, Monolith, Skyscraper, Tip4', Tip5, Arion, Polocolo
+Poseidon, Poseidon2, Griffin, Anemoi, Rescue-Prime, GMiMC-ERF, S-GMiMC, Neptune, ReinforcedConcrete, Monolith, Skyscraper, Tip4', Tip5, Arion, Polocolo, XHash, pSquare-hash
 
 **Cryptographic Hash Functions:**
 SHA-256, Keccak-f[1600], Blake2b, Blake3
@@ -24,7 +24,14 @@ SHA-256, Keccak-f[1600], Blake2b, Blake3
 **Fields:** BN254, BLS12-381 (~256-bit); Goldilocks (~64-bit);
 Mersenne31, BabyBear, KoalaBear (~31-bit)
 
+New formal profiles:
+
+- pSquare-hash: untweaked Mersenne31, `t=16/24`, `R=52`, `c=8`.
+- XHash8/12-Goldilocks: both use `t=12`, `R=7`, `c=4`; the name is the number of active inverse S-boxes.
+- XHash16/24-M31: both use `t=24`, `R=7`, `c=8`; the name is the number of active inverse S-boxes.
+
 ## Output
 
 Each permutation is called 2^14 = 16,384 times on a fixed deterministic input.
 Throughput is reported as average nanoseconds per call.
+The ZK-friendly rows use their allocating `permutation` wrappers, including the two new implementations, so their measurements share the existing root-runner convention.

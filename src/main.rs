@@ -1,8 +1,8 @@
 // SoK paper benchmark: Type-1, Type-2, Type-3 hash permutations + baselines.
 //
 // Target hashes (from the March-4 meeting):
-//   Type1: S-GMiMC / Poseidon2 / Neptune
-//   Type2: Rescue  / Arion    / Anemoi / Griffin
+//   Type1: S-GMiMC / Poseidon2 / Neptune / pSquare-hash
+//   Type2: Rescue  / Arion    / Anemoi / Griffin / XHash
 //   Type3: Monolith / Polocolo / Tip5
 //
 // Baselines: SHA-256, Keccak-f[1600], Blake2b, Blake3.
@@ -50,6 +50,9 @@ use sok_zk_friendly_hash_functions::poseidon2::instances::{
     POSEIDON2_KOALABEAR_16_PARAMS, POSEIDON2_KOALABEAR_24_PARAMS,
     POSEIDON2_MERSENNE31_16_PARAMS, POSEIDON2_MERSENNE31_24_PARAMS,
 };
+use sok_zk_friendly_hash_functions::psquarehash::{
+    PSquareHash, PSQUAREHASH_MERSENNE31_16_PARAMS, PSQUAREHASH_MERSENNE31_24_PARAMS,
+};
 use sok_zk_friendly_hash_functions::rescueprime::instances::{
     RESCUE_PRIME_BLS12_381_2_PARAMS, RESCUE_PRIME_BLS12_381_3_PARAMS,
     RESCUE_PRIME_BN254_2_PARAMS, RESCUE_PRIME_BN254_3_PARAMS,
@@ -67,6 +70,9 @@ use sok_zk_friendly_hash_functions::gmimc2::instances::{
 use sok_zk_friendly_hash_functions::gmimc2::gmimc2::Gmimc2;
 use sok_zk_friendly_hash_functions::tip5::instances::TIP5_GOLDILOCKS_PARAMS;
 use sok_zk_friendly_hash_functions::tip5::tip5::{Tip5, Tip5Field};
+use sok_zk_friendly_hash_functions::xhash::{
+    xhash12_goldilocks, xhash16_m31, xhash24_m31, xhash8_goldilocks, XHash,
+};
 use sok_zk_friendly_hash_functions::plain_hashes;
 use std::hint::black_box;
 use std::time::Instant;
@@ -136,6 +142,20 @@ fn main() {
     bench_neptune("Neptune KoalaBear t=24", &Neptune::new(&NEPTUNE_KOALABEAR_24_PARAMS), ITERS);
     bench_neptune("Neptune Mersenne31 t=24", &Neptune::new(&NEPTUNE_MERSENNE31_24_PARAMS), ITERS);
 
+    // --- pSquare-hash ---
+
+    println!("\n== pSquare-hash (Mersenne31, untweaked) ==");
+    bench_psquarehash(
+        "pSquare-hash Mersenne31 t=16",
+        &PSquareHash::new(&PSQUAREHASH_MERSENNE31_16_PARAMS),
+        ITERS,
+    );
+    bench_psquarehash(
+        "pSquare-hash Mersenne31 t=24",
+        &PSquareHash::new(&PSQUAREHASH_MERSENNE31_24_PARAMS),
+        ITERS,
+    );
+
     // ============================================================
     // Type-2: Rescue / Arion / Anemoi / Griffin
     // ============================================================
@@ -177,6 +197,14 @@ fn main() {
     println!("\n== Arion (~256-bit fields) ==");
     bench_arion("Arion BN254 t=3", &Arion::new(&ARION_BN254_3_PARAMS), ITERS);
     bench_arion("Arion BLS12-381 t=3", &Arion::new(&ARION_BLS12_381_3_PARAMS), ITERS);
+
+    // --- XHash ---
+
+    println!("\n== XHash (formal DCC'26 profiles) ==");
+    bench_xhash("XHash8 Goldilocks t=12", &xhash8_goldilocks(), ITERS);
+    bench_xhash("XHash12 Goldilocks t=12", &xhash12_goldilocks(), ITERS);
+    bench_xhash("XHash16 Mersenne31 t=24", &xhash16_m31(), ITERS);
+    bench_xhash("XHash24 Mersenne31 t=24", &xhash24_m31(), ITERS);
 
     // ============================================================
     // Type-3: Monolith / Polocolo / Tip5
@@ -265,6 +293,16 @@ fn bench_rescue<F: FieldElement>(label: &str, perm: &RescuePrime<F>, iters: usiz
 }
 
 fn bench_arion<F: FieldElement>(label: &str, perm: &Arion<F>, iters: usize) {
+    let input = make_input::<F>(perm.get_t());
+    bench_with_input(label, iters, &input, |inp| perm.permutation(inp));
+}
+
+fn bench_psquarehash<F: FieldElement>(label: &str, perm: &PSquareHash<F>, iters: usize) {
+    let input = make_input::<F>(perm.get_t());
+    bench_with_input(label, iters, &input, |inp| perm.permutation(inp));
+}
+
+fn bench_xhash<F: FieldElement>(label: &str, perm: &XHash<F>, iters: usize) {
     let input = make_input::<F>(perm.get_t());
     bench_with_input(label, iters, &input, |inp| perm.permutation(inp));
 }

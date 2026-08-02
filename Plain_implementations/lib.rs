@@ -29,5 +29,8 @@ pub mod skyscraper;
 pub mod polocolo;
 #[path = "Arion/mod.rs"]
 pub mod arion;
-// XHash removed: not in SoK benchmark scope.
+#[path = "Psquarehash/mod.rs"]
+pub mod psquarehash;
+#[path = "XHash/mod.rs"]
+pub mod xhash;
 // VisionMark32 removed: binary-field design, not in SoK benchmark scope.
