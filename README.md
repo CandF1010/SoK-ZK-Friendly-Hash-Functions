@@ -24,8 +24,6 @@ SHA-256, Keccak-f[1600], Blake2b, Blake3
 **Fields:** BN254, BLS12-381 (~256-bit); Goldilocks (~64-bit);
 Mersenne31, BabyBear, KoalaBear (~31-bit)
 
-New formal profiles:
-
 - pSquare-hash: untweaked Mersenne31, `t=16/24`, `R=52`, `c=8`.
 - XHash8/12-Goldilocks: both use `t=12`, `R=7`, `c=4`; the name is the number of active inverse S-boxes.
 - XHash16/24-M31: both use `t=24`, `R=7`, `c=8`; the name is the number of active inverse S-boxes.
